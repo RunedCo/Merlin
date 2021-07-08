@@ -1,0 +1,6 @@
+name: Merlin
+version: ${project.version}
+main: co.runed.merlin.Merlin
+api-version: 1.16
+
+depend: [ CommandAPI, ProtocolLib, Bolster, EffectLib ]
