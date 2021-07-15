@@ -58,8 +58,8 @@ public class Runeblade extends Item
                                 )
                         )
                 )
-                .then(null)
-                .last(null)
+                .then((Ability) null)
+                .last((Ability) null)
         );
     }
 

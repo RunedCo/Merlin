@@ -17,6 +17,7 @@ public class RepeatingAbility extends Ability
     long frequency = 0;
     Supplier<Boolean> runUntil;
     int repeats = 0;
+    Duration duration = Duration.ZERO;
 
     public RepeatingAbility until(Supplier<Boolean> runUntil)
     {
@@ -35,6 +36,8 @@ public class RepeatingAbility extends Ability
     @Override
     public RepeatingAbility duration(Duration duration)
     {
+        this.duration = duration;
+
         return (RepeatingAbility) super.duration(duration);
     }
 
@@ -55,9 +58,9 @@ public class RepeatingAbility extends Ability
     @Override
     public void activateAbilityAndChildren(Properties properties)
     {
-        if (this.getDuration() != null)
+        if (this.duration != null)
         {
-            TaskUtil.runDurationTaskTimer(Bolster.getInstance(), () -> this.run(properties), this.getDuration(), frequency, frequency);
+            TaskUtil.runDurationTaskTimer(Bolster.getInstance(), () -> this.run(properties), this.duration, frequency, frequency);
         }
         else if (this.runUntil != null)
         {

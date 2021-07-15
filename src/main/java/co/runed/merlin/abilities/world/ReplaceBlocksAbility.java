@@ -1,6 +1,6 @@
 package co.runed.merlin.abilities.world;
 
-import co.runed.bolster.common.util.collection.RandomCollection;
+import co.runed.bolster.common.collection.RandomCollection;
 import co.runed.bolster.util.BukkitUtil;
 import co.runed.bolster.util.properties.Properties;
 import co.runed.merlin.target.Target;

@@ -5,6 +5,7 @@ import co.runed.bolster.game.Cost;
 import co.runed.bolster.managers.CooldownManager;
 import co.runed.bolster.util.IDescribable;
 import co.runed.bolster.util.TaskUtil;
+import co.runed.bolster.util.TimeUtil;
 import co.runed.bolster.util.config.IConfigurable;
 import co.runed.bolster.util.cooldown.ICooldownSource;
 import co.runed.bolster.util.properties.Properties;
@@ -62,7 +63,7 @@ public abstract class Ability implements Listener, IRegisterable, IConfigurable,
     boolean evaluateConditions = true;
     boolean useCosts = true;
     boolean inProgress = false;
-    boolean showCooldowns = false;
+    boolean showCooldown = false;
     boolean mustBeActive = true;
     boolean mustBeInInventory = true;
     boolean skipIfCancelled = false;
@@ -73,9 +74,9 @@ public abstract class Ability implements Listener, IRegisterable, IConfigurable,
     boolean cancelledByCast = false;
 
     long lastErrorTime = 0;
-    boolean casting = false;
     boolean cancelled = false;
     TaskUtil.TaskSeries castingTask;
+    TaskUtil.TaskSeries seriesTask;
 
     LivingEntity caster;
     AbilityProvider abilityProvider;
@@ -214,7 +215,31 @@ public abstract class Ability implements Listener, IRegisterable, IConfigurable,
 
     public Duration getDuration()
     {
+//        if (this.duration != Duration.ZERO) return this.duration;
+        Duration duration = this.getLongestDuration(this.abilities, this.duration);
+
+        for (Ability ability : this.thenAbilities)
+        {
+            duration = duration.plus(ability.getDuration());
+        }
+
+        Duration lastDuration = this.getLongestDuration(this.lastAbilities, Duration.ZERO);
+
+        duration = duration.plus(lastDuration);
+
         return duration;
+    }
+
+    private Duration getLongestDuration(Collection<Ability> abilities, Duration startDuration)
+    {
+        Duration currentDuration = startDuration;
+
+        for (Ability ability : abilities)
+        {
+            if (ability.getDuration().compareTo(currentDuration) > 0) currentDuration = ability.getDuration();
+        }
+
+        return currentDuration;
     }
 
     /* Charges */
@@ -272,14 +297,14 @@ public abstract class Ability implements Listener, IRegisterable, IConfigurable,
     /* Show cooldown on item */
     public Ability showCooldown(boolean show)
     {
-        this.showCooldowns = show;
+        this.showCooldown = show;
 
         return this;
     }
 
     public boolean showCooldown()
     {
-        return showCooldowns;
+        return showCooldown;
     }
 
     /* Must be in equipped in an active slot */
@@ -412,12 +437,37 @@ public abstract class Ability implements Listener, IRegisterable, IConfigurable,
         return this;
     }
 
+    public Ability then(BiConsumer<LivingEntity, Properties> on)
+    {
+        return then(new FunctionAbility(on));
+    }
+
+    public Ability then(Function<Properties, Ability> on)
+    {
+        return then(new DynamicParameterAbility(on));
+    }
+
+    public Ability thenDelay(Duration delay)
+    {
+        return this.then(Ability.builder().duration(delay));
+    }
+
     /* Concurrent last abilities */
     public Ability last(Ability ability)
     {
         this.lastAbilities.add(ability);
 
         return this;
+    }
+
+    public Ability last(BiConsumer<LivingEntity, Properties> on)
+    {
+        return last(new FunctionAbility(on));
+    }
+
+    public Ability last(Function<Properties, Ability> on)
+    {
+        return last(new DynamicParameterAbility(on));
     }
 
     /* Caster */
@@ -443,6 +493,8 @@ public abstract class Ability implements Listener, IRegisterable, IConfigurable,
                 return true;
             }
         }
+
+        // if ability in progress, casting, not cancelled, waiting for then
 
         return false;
     }
@@ -596,6 +648,7 @@ public abstract class Ability implements Listener, IRegisterable, IConfigurable,
         this.cancelled = true;
         this.setInProgress(false);
         if (this.castingTask != null) this.castingTask.cancel();
+        if (this.seriesTask != null) this.seriesTask.cancel();
         this.setInProgress(false);
     }
 
@@ -668,7 +721,7 @@ public abstract class Ability implements Listener, IRegisterable, IConfigurable,
         if (this.getAbilityProvider() != null && !this.getAbilityProvider().isEnabled()) return false;
         if (!this.isEnabled()) return false;
 
-        if (this.casting) return false;
+        if (this.inProgress) return false;
 
         if (this.shouldEvaluateConditions() && !this.evaluateConditions(properties)) return false;
         return !this.shouldUseCosts() || this.evaluateCosts(properties);
@@ -708,7 +761,6 @@ public abstract class Ability implements Listener, IRegisterable, IConfigurable,
         if (!canActivate(properties)) return false;
         if (shouldUseCosts() && !applyCosts(properties)) return false;
 
-        casting = true;
         setInProgress(true);
 
         // TODO change system for cast time
@@ -729,8 +781,7 @@ public abstract class Ability implements Listener, IRegisterable, IConfigurable,
                         player.setLevel(0);
 
                     }, castTimeTicks, CAST_BAR_UPDATE_TICKS)
-                    .add(() -> preActivate(properties))
-                    .onCancel(() -> preActivate(properties));
+                    .addAndCancel(() -> preActivate(properties));
 
             return true;
         }
@@ -743,10 +794,29 @@ public abstract class Ability implements Listener, IRegisterable, IConfigurable,
     {
         this.onActivate(properties);
 
-        for (var ability : this.getChildren())
+        for (var ability : this.abilities)
         {
             ability.activate(properties);
         }
+
+        if (this.thenAbilities.size() <= 0 && this.lastAbilities.size() <= 0) return;
+
+        Duration childrenDuration = this.getLongestDuration(this.abilities, Duration.ZERO);
+
+        seriesTask = new TaskUtil.TaskSeries()
+                .delay(TimeUtil.toTicks(childrenDuration));
+
+        for (var ability : this.thenAbilities)
+        {
+            seriesTask = seriesTask.add(() -> ability.activate(properties), TimeUtil.toTicks(ability.getDuration()));
+        }
+
+        seriesTask.add(() -> {
+            for (var ability : this.lastAbilities)
+            {
+                ability.activate(properties);
+            }
+        });
     }
 
     private void preActivate(Properties properties)
@@ -765,7 +835,6 @@ public abstract class Ability implements Listener, IRegisterable, IConfigurable,
             this.onPostActivate(properties);
         }
 
-        this.casting = false;
         this.cancelled = false;
         this.castingTask = null;
         this.setInProgress(false);
