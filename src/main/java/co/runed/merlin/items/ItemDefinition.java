@@ -9,6 +9,9 @@ import java.util.concurrent.Callable;
 
 public class ItemDefinition extends Definition<Item>
 {
+    int maxLevel = 0;
+    boolean levelable = false;
+
     public ItemDefinition(String id, Callable<Item> callable)
     {
         super(id, callable);
@@ -36,5 +39,29 @@ public class ItemDefinition extends Definition<Item>
     public DefinitionRegistry<Item> getRegistry()
     {
         return MerlinRegistries.ITEMS;
+    }
+
+    public ItemDefinition setLevelable(boolean levelable)
+    {
+        this.levelable = levelable;
+
+        return this;
+    }
+
+    public ItemDefinition setMaxLevel(int maxLevel)
+    {
+        this.maxLevel = maxLevel;
+
+        return this;
+    }
+
+    public boolean isLevelable()
+    {
+        return levelable;
+    }
+
+    public int getMaxLevel()
+    {
+        return maxLevel;
     }
 }
