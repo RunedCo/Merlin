@@ -1,9 +1,9 @@
 package co.runed.merlin.upgrade;
 
+import co.runed.bolster.util.IIdentifiable;
 import co.runed.bolster.util.INameable;
 import co.runed.bolster.util.StringUtil;
 import co.runed.bolster.util.config.IConfigurable;
-import co.runed.bolster.util.registries.IRegisterable;
 import co.runed.merlin.abilities.Ability;
 import co.runed.merlin.abilities.AbilityTrigger;
 import co.runed.merlin.core.MerlinRegistries;
@@ -20,7 +20,7 @@ import java.util.function.Supplier;
  * Can set name, max number of points and starting number of points + cost
  * cost units are arbitrary and should be handled by the thing using the upgrade (e.g. mana or $$$)
  */
-public class Upgrade implements IRegisterable, IConfigurable, INameable
+public class Upgrade implements IIdentifiable, IConfigurable, INameable
 {
     // upgrade needs a way to add abilities, maybe have separate UpgradeInfo class that can get added
     // .addAbility(AbilityTrigger.LEFT_CLICK, () -> new DisguiseAbility(EntityType.ARMOR_STAND))

@@ -1,14 +1,14 @@
 package co.runed.merlin.items;
 
+import co.runed.bolster.util.IIdentifiable;
 import co.runed.bolster.util.ItemBuilder;
 import co.runed.bolster.util.config.IConfigurable;
-import co.runed.bolster.util.registries.IRegisterable;
 import co.runed.merlin.core.MerlinRegistries;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
-public class ItemSkin implements IRegisterable, IConfigurable
+public class ItemSkin implements IIdentifiable, IConfigurable
 {
     private final String id;
     private String name = "";

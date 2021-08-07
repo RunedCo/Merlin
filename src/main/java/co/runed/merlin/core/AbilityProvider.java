@@ -6,12 +6,12 @@ import co.runed.bolster.game.traits.TraitProvider;
 import co.runed.bolster.game.traits.Traits;
 import co.runed.bolster.util.ComponentUtil;
 import co.runed.bolster.util.IDescribable;
+import co.runed.bolster.util.IIdentifiable;
 import co.runed.bolster.util.StringUtil;
 import co.runed.bolster.util.config.ConfigUtil;
 import co.runed.bolster.util.config.IConfigurable;
 import co.runed.bolster.util.properties.Properties;
 import co.runed.bolster.util.registries.DefinitionRegistry;
-import co.runed.bolster.util.registries.IRegisterable;
 import co.runed.bolster.util.registries.Registry;
 import co.runed.merlin.abilities.Ability;
 import co.runed.merlin.abilities.AbilityTrigger;
@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public abstract class AbilityProvider extends TraitProvider implements IConfigurable, IRegisterable, IDescribable
+public abstract class AbilityProvider extends TraitProvider implements IConfigurable, IIdentifiable, IDescribable
 {
     String id = null;
     String name = "";

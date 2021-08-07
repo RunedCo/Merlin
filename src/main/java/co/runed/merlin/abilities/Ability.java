@@ -4,12 +4,12 @@ import co.runed.bolster.Bolster;
 import co.runed.bolster.game.Cost;
 import co.runed.bolster.managers.CooldownManager;
 import co.runed.bolster.util.IDescribable;
+import co.runed.bolster.util.IIdentifiable;
 import co.runed.bolster.util.TaskUtil;
 import co.runed.bolster.util.TimeUtil;
 import co.runed.bolster.util.config.IConfigurable;
 import co.runed.bolster.util.cooldown.ICooldownSource;
 import co.runed.bolster.util.properties.Properties;
-import co.runed.bolster.util.registries.IRegisterable;
 import co.runed.merlin.abilities.core.DynamicParameterAbility;
 import co.runed.merlin.abilities.core.FunctionAbility;
 import co.runed.merlin.conditions.Condition;
@@ -33,7 +33,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public abstract class Ability implements Listener, IRegisterable, IConfigurable, IDescribable, IConditional<Ability>, ICooldownSource<Ability>
+public abstract class Ability implements Listener, IIdentifiable, IConfigurable, IDescribable, IConditional<Ability>, ICooldownSource<Ability>
 {
     private static final long CAST_BAR_UPDATE_TICKS = 5L;
 
@@ -721,7 +721,7 @@ public abstract class Ability implements Listener, IRegisterable, IConfigurable,
         if (this.getAbilityProvider() != null && !this.getAbilityProvider().isEnabled()) return false;
         if (!this.isEnabled()) return false;
 
-        if (this.inProgress) return false;
+        if (this.isInProgress()) return false;
 
         if (this.shouldEvaluateConditions() && !this.evaluateConditions(properties)) return false;
         return !this.shouldUseCosts() || this.evaluateCosts(properties);
