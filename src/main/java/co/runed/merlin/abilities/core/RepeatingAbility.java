@@ -17,6 +17,7 @@ public class RepeatingAbility extends Ability
     long frequency = 0;
     Supplier<Boolean> runUntil;
     int repeats = 0;
+    int maxDuration = -1;
     Duration duration = Duration.ZERO;
 
     public RepeatingAbility until(Supplier<Boolean> runUntil)
