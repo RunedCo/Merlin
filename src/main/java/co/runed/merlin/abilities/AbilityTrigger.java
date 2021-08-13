@@ -1,6 +1,7 @@
 package co.runed.merlin.abilities;
 
 import co.runed.bolster.util.properties.Properties;
+import co.runed.merlin.Merlin;
 import co.runed.merlin.core.AbilityManager;
 import co.runed.merlin.core.AbilityProvider;
 import org.bukkit.Bukkit;
@@ -119,11 +120,29 @@ public class AbilityTrigger
         return AbilityManager.getInstance().trigger(entity, provider, this, properties);
     }
 
+    public void triggerAsync(LivingEntity entity, Properties properties)
+    {
+        this.triggerAsync(entity, null, properties);
+    }
+
+    public void triggerAsync(LivingEntity entity, AbilityProvider provider, Properties properties)
+    {
+        Bukkit.getScheduler().runTask(Merlin.getInstance(), () -> AbilityManager.getInstance().trigger(entity, provider, this, properties));
+    }
+
     public void triggerAll(Properties properties)
     {
         for (Player player : Bukkit.getOnlinePlayers())
         {
             this.trigger(player, null, new Properties(properties));
+        }
+    }
+
+    public void triggerAllAsync(Properties properties)
+    {
+        for (Player player : Bukkit.getOnlinePlayers())
+        {
+            this.triggerAsync(player, null, new Properties(properties));
         }
     }
 }

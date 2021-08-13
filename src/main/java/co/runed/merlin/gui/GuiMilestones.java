@@ -112,14 +112,14 @@ public class GuiMilestones extends Gui
                 .build();
 
         ItemStack baseIcon = this.item.getIcon();
-        List<String> stats = this.item.getStatsLore();
+        List<Component> stats = this.item.getStatsLore();
         ItemBuilder builder = new ItemBuilder(baseIcon.getType())
                 .setDisplayName(baseIcon.getItemMeta().displayName())
                 .addItemFlags(baseIcon.getItemMeta().getItemFlags());
 
         if (stats.size() > 0)
         {
-            builder = builder.addLore(stats)
+            builder = builder.addLoreComponent(stats)
                     .addLore("");
         }
 

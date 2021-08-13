@@ -90,6 +90,9 @@ public class ItemManager extends Manager
         // NOTE: must not create the item instance unless there is no item instance of the same type created already
         //       if we create the item instance it causes high cpu load due to constantly remaking any ticking ability instances
         Item existingItem = (Item) AbilityManager.getInstance().getProvider(entity, AbilityProviderType.ITEM, id);
+
+        if (existingItem == null && (id == null || !MerlinRegistries.ITEMS.contains(id))) return null;
+
         Item newItem = existingItem != null ? existingItem : MerlinRegistries.ITEMS.get(id).create();
         Item item = (Item) AbilityManager.getInstance().addProvider(entity, newItem);
 
@@ -150,6 +153,8 @@ public class ItemManager extends Manager
      */
     public Item giveItem(LivingEntity entity, Inventory inventory, Definition<Item> itemDef, int amount)
     {
+        if (itemDef == null) return null;
+
         return this.giveItem(entity, inventory, itemDef.getId(), amount);
     }
 
@@ -200,6 +205,8 @@ public class ItemManager extends Manager
 
     public boolean canGiveItem(LivingEntity entity, String itemId, int amount)
     {
+        if (itemId == null) return false;
+
         Item item = this.createItem(entity, itemId);
 
         if (item == null) return false;
@@ -207,7 +214,9 @@ public class ItemManager extends Manager
         int currentAmount = getAllInventoryItemCount(entity, itemId);
         int newAmount = currentAmount + amount;
 
-        return newAmount < item.getMaxInInventory() || item.getMaxInInventory() <= -1;
+        int max = item.getMaxInInventory();
+
+        return newAmount <= max || max <= -1;
     }
 
     /**

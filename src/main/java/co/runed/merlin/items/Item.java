@@ -57,7 +57,7 @@ public abstract class Item extends AbilityProvider
         super.loadConfig(config);
 
         /* Attributes */
-        this.setTrait(MerlinTraits.ATTACK_DAMAGE, config.getDouble(ATTACK_DAMAGE_KEY, 0));
+        this.setTrait(MerlinTraits.ATTACK_DAMAGE, config.getDouble(ATTACK_DAMAGE_KEY, 1));
         this.setTrait(MerlinTraits.ATTACK_SPEED, config.getDouble(ATTACK_SPEED_KEY, 0));
         this.setTrait(MerlinTraits.KNOCKBACK_RESISTANCE, config.getDouble(KNOCKBACK_RESISTANCE_KEY, 0));
         this.setTrait(MerlinTraits.KNOCKBACK, config.getDouble(KNOCKBACK_KEY, 0));
@@ -134,9 +134,9 @@ public abstract class Item extends AbilityProvider
         return skin;
     }
 
-    public List<String> getStatsLore()
+    public List<Component> getStatsLore()
     {
-        List<String> out = new ArrayList<>();
+        List<Component> out = new ArrayList<>();
 
         // TODO
 
@@ -146,24 +146,24 @@ public abstract class Item extends AbilityProvider
         var knockBack = this.getTrait(MerlinTraits.KNOCKBACK);
         var maxHealth = this.getTrait(Traits.MAX_HEALTH);
 
-        if (attackDamage > 0)
+        if (attackDamage > 1)
         {
-            out.add(ChatColor.GRAY + "Attack Damage: " + ChatColor.AQUA + attackDamage);
+            out.add(Component.text(ChatColor.GRAY + "Attack Damage: " + ChatColor.AQUA + attackDamage));
         }
 
         if (knockBack > 0)
         {
-            out.add(ChatColor.GRAY + "Knockback: " + ChatColor.AQUA + knockBack);
+            out.add(Component.text(ChatColor.GRAY + "Knockback: " + ChatColor.AQUA + knockBack));
         }
 
         if (knockBackResistance > 0)
         {
-            out.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.AQUA + knockBackResistance);
+            out.add(Component.text(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.AQUA + knockBackResistance));
         }
 
         if (maxHealth > 0)
         {
-            out.add(ChatColor.GRAY + "Health: " + ChatColor.AQUA + maxHealth);
+            out.add(Component.text(ChatColor.GRAY + "Health: " + ChatColor.AQUA + maxHealth));
         }
 
         return out;
@@ -244,7 +244,9 @@ public abstract class Item extends AbilityProvider
                 .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                 .addItemFlag(ItemFlag.HIDE_UNBREAKABLE);
 
-        var lore = this.getLore();
+        var lore = new ArrayList<Component>();
+        lore.addAll(getStatsLore());
+        lore.addAll(this.getLore());
 
         if (lore.size() > 0) builder = builder.setLoreComponent(lore);
 
@@ -254,7 +256,7 @@ public abstract class Item extends AbilityProvider
         var knockBack = this.getTrait(MerlinTraits.KNOCKBACK);
         var maxHealth = this.getTrait(Traits.MAX_HEALTH);
 
-        builder = builder.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, new AttributeModifier(attackDamageUuid, "attack_damage", attackDamage, AttributeModifier.Operation.ADD_NUMBER))
+        builder = builder.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, new AttributeModifier(attackDamageUuid, "attack_damage", attackDamage > 0 ? attackDamage : 1, AttributeModifier.Operation.ADD_NUMBER))
                 .addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(attackSpeedUuid, "attack_speed", attackSpeed, AttributeModifier.Operation.ADD_NUMBER))
                 .addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, new AttributeModifier(knockbackResistanceUuid, "knockback_resistance", knockBackResistance, AttributeModifier.Operation.ADD_NUMBER))
                 .addAttributeModifier(Attribute.GENERIC_ATTACK_KNOCKBACK, new AttributeModifier(knockBackUuid, "knockback", knockBack, AttributeModifier.Operation.ADD_NUMBER))

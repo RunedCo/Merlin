@@ -1,5 +1,6 @@
 package co.runed.merlin.abilities.items;
 
+import co.runed.bolster.Bolster;
 import co.runed.bolster.entity.BolsterEntity;
 import co.runed.bolster.util.Definition;
 import co.runed.bolster.util.properties.Properties;
@@ -16,23 +17,23 @@ import org.bukkit.entity.Player;
 public class GiveItemAbility extends Ability
 {
     Target<BolsterEntity> target;
-    Definition<Item> itemDef;
     int amount = 1;
-
-    public GiveItemAbility(Target<BolsterEntity> target, String itemId, int amount)
-    {
-        this(target, MerlinRegistries.ITEMS.get(itemId), amount);
-    }
+    String itemId;
 
     public GiveItemAbility(Target<BolsterEntity> target, Definition<Item> itemDef, int amount)
+    {
+        this(target, MerlinRegistries.ITEMS.getId(itemDef), amount);
+    }
+
+    public GiveItemAbility(Target<BolsterEntity> target, String itemId, int amount)
     {
         super();
 
         this.target = target;
-        this.itemDef = itemDef;
+        this.itemId = itemId;
         this.amount = amount;
 
-        this.condition(new CanGiveItemCondition(target, itemDef, amount));
+        this.condition(new CanGiveItemCondition(target, itemId, amount));
     }
 
     @Override
@@ -42,7 +43,14 @@ public class GiveItemAbility extends Ability
 
         if (!(entity instanceof Player player)) return;
 
-        ItemManager.getInstance().giveItem(entity, player.getInventory(), this.itemDef, this.amount);
+        if (itemId == null)
+        {
+            Bolster.getInstance().getLogger().severe("Error giving item with id " + this.itemId + " to " + player.getName() + " (not registered!)");
+
+            return;
+        }
+
+        ItemManager.getInstance().giveItem(entity, player.getInventory(), this.itemId, this.amount);
     }
 
     @Override

@@ -44,7 +44,7 @@ public class DynamicParameterAbility extends Ability
     {
         super.onPostActivate(properties);
 
-        this.ability(this.instanceAbility);
+        this.removeAbility(this.instanceAbility);
     }
 
     @Override

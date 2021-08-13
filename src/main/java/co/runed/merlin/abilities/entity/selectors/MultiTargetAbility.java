@@ -2,10 +2,10 @@ package co.runed.merlin.abilities.entity.selectors;
 
 import co.runed.bolster.entity.BolsterEntity;
 import co.runed.bolster.util.properties.Properties;
-import co.runed.merlin.target.Target;
 import co.runed.merlin.abilities.Ability;
 import co.runed.merlin.abilities.AbilityProperties;
 import co.runed.merlin.conditions.Condition;
+import co.runed.merlin.target.Target;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 
@@ -111,6 +111,21 @@ public class MultiTargetAbility extends Ability
         this.conditions = oldConditions;
 
         return success;
+    }
+    
+    // TODO TEST
+    @Override
+    public boolean isInProgress()
+    {
+        for (var ability : this.getChildren())
+        {
+            if (ability.isInProgress())
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     // TODO might not work (see old implementation on github)

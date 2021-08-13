@@ -30,11 +30,11 @@ public abstract class LevelableItem extends Item
     private static final String MILESTONE_LEVELS_KEY = "milestones";
 
     @Override
-    public List<String> getStatsLore()
+    public List<Component> getStatsLore()
     {
-        List<String> out = new ArrayList<>();
+        List<Component> out = new ArrayList<>();
 
-        out.add(this.getLevelDisplayText());
+        out.add(Component.text(this.getLevelDisplayText()));
         out.addAll(super.getStatsLore());
 
         return out;

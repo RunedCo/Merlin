@@ -416,6 +416,8 @@ public abstract class Ability implements Listener, IIdentifiable, IConfigurable,
     {
         this.abilities.add(ability);
 
+        this.updateChildren();
+
         return this;
     }
 
@@ -429,10 +431,21 @@ public abstract class Ability implements Listener, IIdentifiable, IConfigurable,
         return ability(new DynamicParameterAbility(on));
     }
 
+    public void removeAbility(Ability ability)
+    {
+        this.abilities.remove(ability);
+        this.thenAbilities.remove(ability);
+        this.lastAbilities.remove(ability);
+
+        this.updateChildren();
+    }
+
     /* Sequenced abilities */
     public Ability then(Ability ability)
     {
         this.thenAbilities.add(ability);
+
+        this.updateChildren();
 
         return this;
     }
@@ -456,6 +469,8 @@ public abstract class Ability implements Listener, IIdentifiable, IConfigurable,
     public Ability last(Ability ability)
     {
         this.lastAbilities.add(ability);
+
+        this.updateChildren();
 
         return this;
     }
@@ -747,10 +762,19 @@ public abstract class Ability implements Listener, IIdentifiable, IConfigurable,
 
     private void updateChildren()
     {
-        for (var ability : this.getChildren())
+        var children = this.getChildren();
+
+        for (int i = 0; i < children.size(); i++)
         {
+            var ability = children.get(i);
+
             ability.setCaster(caster);
             ability.charges(this.getCharges());
+
+            if (ability.getId() == null)
+            {
+                ability.id(this.getId() + "." + i);
+            }
         }
     }
 

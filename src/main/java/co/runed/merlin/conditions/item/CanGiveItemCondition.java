@@ -3,13 +3,13 @@ package co.runed.merlin.conditions.item;
 import co.runed.bolster.entity.BolsterEntity;
 import co.runed.bolster.util.Definition;
 import co.runed.bolster.util.properties.Properties;
-import co.runed.merlin.target.Target;
 import co.runed.merlin.abilities.AbilityProperties;
 import co.runed.merlin.conditions.Condition;
 import co.runed.merlin.conditions.IConditional;
 import co.runed.merlin.core.ItemManager;
 import co.runed.merlin.core.MerlinRegistries;
 import co.runed.merlin.items.Item;
+import co.runed.merlin.target.Target;
 import org.bukkit.entity.LivingEntity;
 
 public class CanGiveItemCondition extends Condition
@@ -25,6 +25,8 @@ public class CanGiveItemCondition extends Condition
 
     public CanGiveItemCondition(Target<BolsterEntity> target, String id, int count)
     {
+        super();
+
         this.target = target;
         this.id = id;
         this.count = count;
@@ -35,12 +37,14 @@ public class CanGiveItemCondition extends Condition
     {
         LivingEntity entity = this.target.get(properties).getBukkit();
 
-        if (this.id == null)
+        if (this.id == null && properties.contains(AbilityProperties.ITEM))
         {
             this.id = properties.get(AbilityProperties.ITEM).getId();
         }
 
-        return ItemManager.getInstance().canGiveItem(entity, this.id, count);
+        boolean canGive = ItemManager.getInstance().canGiveItem(entity, this.id, count);
+
+        return canGive;
     }
 
     @Override

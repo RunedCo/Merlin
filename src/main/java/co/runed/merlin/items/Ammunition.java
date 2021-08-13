@@ -58,6 +58,12 @@ public abstract class Ammunition extends Item
         this.enabled = false;
     }
 
+    @Override
+    public void create()
+    {
+
+    }
+
     public void addAmmo(int amount)
     {
         this.ammoCount += amount;
