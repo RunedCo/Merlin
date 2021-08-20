@@ -1,7 +1,7 @@
 package co.runed.merlin.conditions.events;
 
-import co.runed.bolster.util.DamageType;
-import co.runed.bolster.util.properties.Properties;
+import co.runed.bolster.damage.DamageType;
+import co.runed.bolster.common.properties.Properties;
 import co.runed.merlin.abilities.AbilityProperties;
 import co.runed.merlin.conditions.Condition;
 import co.runed.merlin.conditions.IConditional;

@@ -1,9 +1,9 @@
 package co.runed.merlin.listeners;
 
-import co.runed.merlin.core.AbilityManager;
-import co.runed.bolster.util.properties.Properties;
+import co.runed.bolster.common.properties.Properties;
 import co.runed.merlin.abilities.AbilityProperties;
 import co.runed.merlin.abilities.AbilityTrigger;
+import co.runed.merlin.core.AbilityManager;
 import co.runed.merlin.core.ItemManager;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -41,7 +41,6 @@ public class PlayerSelectListener implements Listener
 
             AbilityManager.getInstance().trigger(entity, AbilityTrigger.ON_DESELECT_ITEM, properties);
         }
-
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

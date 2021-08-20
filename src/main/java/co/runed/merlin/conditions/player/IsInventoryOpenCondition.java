@@ -1,7 +1,7 @@
 package co.runed.merlin.conditions.player;
 
 import co.runed.bolster.entity.BolsterEntity;
-import co.runed.bolster.util.properties.Properties;
+import co.runed.bolster.common.properties.Properties;
 import co.runed.merlin.target.Target;
 import co.runed.bolster.wip.InventoryTracker;
 import co.runed.merlin.conditions.Condition;

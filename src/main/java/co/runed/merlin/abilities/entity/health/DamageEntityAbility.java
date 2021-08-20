@@ -1,11 +1,11 @@
 package co.runed.merlin.abilities.entity.health;
 
+import co.runed.bolster.damage.DamageType;
 import co.runed.bolster.entity.BolsterEntity;
-import co.runed.bolster.util.DamageType;
-import co.runed.bolster.util.properties.Properties;
-import co.runed.merlin.target.Target;
+import co.runed.bolster.common.properties.Properties;
 import co.runed.bolster.v1_16_R3.CraftUtil;
 import co.runed.merlin.abilities.Ability;
+import co.runed.merlin.target.Target;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.LivingEntity;
 

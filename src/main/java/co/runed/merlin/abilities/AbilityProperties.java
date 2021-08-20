@@ -2,8 +2,8 @@ package co.runed.merlin.abilities;
 
 import co.runed.bolster.entity.BolsterEntity;
 import co.runed.bolster.status.StatusEffect;
-import co.runed.bolster.util.properties.FunctionProperty;
-import co.runed.bolster.util.properties.Property;
+import co.runed.bolster.common.properties.FunctionProperty;
+import co.runed.bolster.common.properties.Property;
 import co.runed.merlin.core.AbilityProvider;
 import co.runed.merlin.items.Item;
 import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;

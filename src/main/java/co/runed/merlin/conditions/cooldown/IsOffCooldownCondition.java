@@ -1,7 +1,7 @@
 package co.runed.merlin.conditions.cooldown;
 
 import co.runed.bolster.util.cooldown.ICooldownSource;
-import co.runed.bolster.util.properties.Properties;
+import co.runed.bolster.common.properties.Properties;
 import co.runed.merlin.abilities.Ability;
 import co.runed.merlin.conditions.Condition;
 import co.runed.merlin.conditions.IConditional;

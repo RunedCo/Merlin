@@ -2,7 +2,7 @@ package co.runed.merlin.abilities.entity.ability;
 
 import co.runed.bolster.entity.BolsterEntity;
 import co.runed.bolster.util.cooldown.ICooldownSource;
-import co.runed.bolster.util.properties.Properties;
+import co.runed.bolster.common.properties.Properties;
 import co.runed.merlin.abilities.Ability;
 import co.runed.merlin.core.AbilityProvider;
 import co.runed.merlin.target.Target;

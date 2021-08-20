@@ -3,7 +3,7 @@ package co.runed.merlin.abilities.effects;
 import co.runed.bolster.fx.particles.ParticleType;
 import co.runed.bolster.game.PlayerData;
 import co.runed.bolster.managers.PlayerManager;
-import co.runed.bolster.util.properties.Properties;
+import co.runed.bolster.common.properties.Properties;
 import co.runed.merlin.target.Target;
 import co.runed.merlin.abilities.Ability;
 import org.bukkit.Location;

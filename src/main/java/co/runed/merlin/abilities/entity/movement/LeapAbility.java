@@ -1,7 +1,7 @@
 package co.runed.merlin.abilities.entity.movement;
 
 import co.runed.bolster.Bolster;
-import co.runed.bolster.util.properties.Properties;
+import co.runed.bolster.common.properties.Properties;
 import co.runed.merlin.abilities.Ability;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;

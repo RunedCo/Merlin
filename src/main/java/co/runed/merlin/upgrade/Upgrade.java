@@ -1,7 +1,7 @@
 package co.runed.merlin.upgrade;
 
-import co.runed.bolster.util.IIdentifiable;
-import co.runed.bolster.util.INameable;
+import co.runed.bolster.common.util.IIdentifiable;
+import co.runed.bolster.common.util.INameable;
 import co.runed.bolster.util.StringUtil;
 import co.runed.bolster.util.config.IConfigurable;
 import co.runed.merlin.abilities.Ability;

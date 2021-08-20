@@ -1,6 +1,6 @@
 package co.runed.merlin.abilities;
 
-import co.runed.bolster.util.properties.Properties;
+import co.runed.bolster.common.properties.Properties;
 import co.runed.merlin.Merlin;
 import co.runed.merlin.core.AbilityManager;
 import co.runed.merlin.core.AbilityProvider;

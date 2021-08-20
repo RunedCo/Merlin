@@ -1,7 +1,7 @@
 package co.runed.merlin.abilities.event;
 
 import co.runed.bolster.common.math.Operation;
-import co.runed.bolster.util.properties.Properties;
+import co.runed.bolster.common.properties.Properties;
 import co.runed.merlin.abilities.Ability;
 import co.runed.merlin.abilities.AbilityProperties;
 import org.bukkit.configuration.ConfigurationSection;

@@ -1,7 +1,7 @@
 package co.runed.merlin.conditions.properties;
 
-import co.runed.bolster.util.properties.Properties;
-import co.runed.bolster.util.properties.Property;
+import co.runed.bolster.common.properties.Properties;
+import co.runed.bolster.common.properties.Property;
 import co.runed.merlin.abilities.Ability;
 import org.bukkit.configuration.ConfigurationSection;
 

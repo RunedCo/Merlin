@@ -1,6 +1,6 @@
 package co.runed.merlin.items;
 
-import co.runed.bolster.util.IIdentifiable;
+import co.runed.bolster.common.util.IIdentifiable;
 import co.runed.bolster.util.ItemBuilder;
 import co.runed.bolster.util.config.IConfigurable;
 import co.runed.merlin.core.MerlinRegistries;

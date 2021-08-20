@@ -2,7 +2,7 @@ package co.runed.merlin.conditions.item;
 
 import co.runed.bolster.entity.BolsterEntity;
 import co.runed.bolster.util.Definition;
-import co.runed.bolster.util.properties.Properties;
+import co.runed.bolster.common.properties.Properties;
 import co.runed.merlin.conditions.Condition;
 import co.runed.merlin.conditions.IConditional;
 import co.runed.merlin.core.ItemManager;

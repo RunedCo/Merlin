@@ -1,6 +1,6 @@
 package co.runed.merlin.items;
 
-import co.runed.bolster.util.DamageType;
+import co.runed.bolster.damage.DamageType;
 import co.runed.merlin.abilities.Ability;
 import co.runed.merlin.abilities.AbilityTrigger;
 import co.runed.merlin.abilities.core.RepeatingAbility;

@@ -2,7 +2,7 @@ package co.runed.merlin.abilities.core;
 
 import co.runed.bolster.Bolster;
 import co.runed.bolster.util.TimeUtil;
-import co.runed.bolster.util.properties.Properties;
+import co.runed.bolster.common.properties.Properties;
 import co.runed.merlin.abilities.Ability;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;

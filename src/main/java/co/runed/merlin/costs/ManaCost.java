@@ -2,7 +2,7 @@ package co.runed.merlin.costs;
 
 import co.runed.bolster.entity.BolsterEntity;
 import co.runed.bolster.game.Cost;
-import co.runed.bolster.util.properties.Properties;
+import co.runed.bolster.common.properties.Properties;
 import co.runed.merlin.abilities.AbilityProperties;
 import co.runed.merlin.core.ManaManager;
 

@@ -3,7 +3,7 @@ package co.runed.merlin.listeners;
 import co.runed.bolster.events.entity.EntityAddStatusEffectEvent;
 import co.runed.bolster.events.entity.EntityRemoveStatusEffectEvent;
 import co.runed.merlin.core.AbilityManager;
-import co.runed.bolster.util.properties.Properties;
+import co.runed.bolster.common.properties.Properties;
 import co.runed.merlin.abilities.AbilityProperties;
 import co.runed.merlin.abilities.AbilityTrigger;
 import org.bukkit.entity.LivingEntity;

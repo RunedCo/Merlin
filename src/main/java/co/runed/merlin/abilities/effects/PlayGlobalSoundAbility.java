@@ -1,6 +1,6 @@
 package co.runed.merlin.abilities.effects;
 
-import co.runed.bolster.util.properties.Properties;
+import co.runed.bolster.common.properties.Properties;
 import co.runed.merlin.target.Target;
 import co.runed.merlin.abilities.Ability;
 import co.runed.merlin.conditions.entity.IsEntityTypeCondition;

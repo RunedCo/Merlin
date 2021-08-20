@@ -2,7 +2,7 @@ package co.runed.merlin.abilities.entity.selectors;
 
 import co.runed.bolster.events.entity.EntityTargetedEvent;
 import co.runed.bolster.util.BukkitUtil;
-import co.runed.bolster.util.properties.Properties;
+import co.runed.bolster.common.properties.Properties;
 import co.runed.merlin.target.Target;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;

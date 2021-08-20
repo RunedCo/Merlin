@@ -1,7 +1,7 @@
 package co.runed.merlin;
 
 import co.runed.bolster.managers.CommandManager;
-import co.runed.bolster.util.properties.Property;
+import co.runed.bolster.common.properties.Property;
 import co.runed.bolster.util.registries.Registries;
 import co.runed.bolster.util.registries.Registry;
 import co.runed.merlin.commands.*;

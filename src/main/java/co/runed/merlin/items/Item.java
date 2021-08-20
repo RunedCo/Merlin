@@ -235,6 +235,12 @@ public abstract class Item extends AbilityProvider
 //        this.lore.clear();
     }
 
+    @Override
+    public ItemStack getIcon()
+    {
+        return this.toItemStack();
+    }
+
     public ItemStack toItemStack()
     {
         ItemBuilder builder = new ItemBuilder(this.getBaseItemStack())
@@ -256,11 +262,11 @@ public abstract class Item extends AbilityProvider
         var knockBack = this.getTrait(MerlinTraits.KNOCKBACK);
         var maxHealth = this.getTrait(Traits.MAX_HEALTH);
 
-        builder = builder.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, new AttributeModifier(attackDamageUuid, "attack_damage", attackDamage > 0 ? attackDamage : 1, AttributeModifier.Operation.ADD_NUMBER))
+        builder = builder.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, new AttributeModifier(attackDamageUuid, "attack_damage", attackDamage > 0 ? attackDamage - 1 : attackDamage, AttributeModifier.Operation.ADD_NUMBER))
                 .addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(attackSpeedUuid, "attack_speed", attackSpeed, AttributeModifier.Operation.ADD_NUMBER))
                 .addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, new AttributeModifier(knockbackResistanceUuid, "knockback_resistance", knockBackResistance, AttributeModifier.Operation.ADD_NUMBER))
-                .addAttributeModifier(Attribute.GENERIC_ATTACK_KNOCKBACK, new AttributeModifier(knockBackUuid, "knockback", knockBack, AttributeModifier.Operation.ADD_NUMBER))
-                .addAttributeModifier(Attribute.GENERIC_MAX_HEALTH, new AttributeModifier(healthUuid, "health", maxHealth, AttributeModifier.Operation.ADD_NUMBER));
+                .addAttributeModifier(Attribute.GENERIC_ATTACK_KNOCKBACK, new AttributeModifier(knockBackUuid, "knockback", knockBack, AttributeModifier.Operation.ADD_NUMBER));
+//                .addAttributeModifier(Attribute.GENERIC_MAX_HEALTH, new AttributeModifier(healthUuid, "health", maxHealth, AttributeModifier.Operation.ADD_NUMBER));
 
         if (this.hasSkin())
         {

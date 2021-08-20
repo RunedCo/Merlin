@@ -3,7 +3,7 @@ package co.runed.merlin.core;
 import co.runed.bolster.entity.BolsterEntity;
 import co.runed.bolster.util.Definition;
 import co.runed.bolster.util.Manager;
-import co.runed.bolster.util.properties.Properties;
+import co.runed.bolster.common.properties.Properties;
 import co.runed.merlin.abilities.AbilityProperties;
 import co.runed.merlin.abilities.AbilityTrigger;
 import co.runed.merlin.events.EntityCastAbilityEvent;
@@ -104,7 +104,9 @@ public class ItemManager extends Manager
         item.rebuild();
 
         if (!existing)
+        {
             AbilityManager.getInstance().trigger(entity, item, AbilityTrigger.CREATE_ITEM, new Properties());
+        }
 
         return item;
     }

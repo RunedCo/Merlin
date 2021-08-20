@@ -1,6 +1,6 @@
 package co.runed.merlin.conditions;
 
-import co.runed.bolster.util.properties.Properties;
+import co.runed.bolster.common.properties.Properties;
 import co.runed.merlin.conditions.base.AndCondition;
 import co.runed.merlin.conditions.base.NotCondition;
 import co.runed.merlin.conditions.base.OrCondition;

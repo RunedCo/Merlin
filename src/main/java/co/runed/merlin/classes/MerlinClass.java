@@ -3,7 +3,7 @@ package co.runed.merlin.classes;
 import co.runed.bolster.game.traits.Traits;
 import co.runed.bolster.managers.StatusEffectManager;
 import co.runed.bolster.util.ItemBuilder;
-import co.runed.bolster.util.properties.Properties;
+import co.runed.bolster.common.properties.Properties;
 import co.runed.merlin.abilities.Ability;
 import co.runed.merlin.abilities.AbilityTrigger;
 import co.runed.merlin.core.*;

@@ -1,11 +1,10 @@
 package co.runed.merlin.abilities.entity.health;
 
 import co.runed.bolster.entity.BolsterEntity;
-import co.runed.bolster.util.properties.Properties;
-import co.runed.merlin.target.Target;
+import co.runed.bolster.common.properties.Properties;
 import co.runed.merlin.abilities.Ability;
+import co.runed.merlin.target.Target;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.ArmorStand;
 
 public class KillEntityAbility extends Ability
 {
@@ -23,14 +22,7 @@ public class KillEntityAbility extends Ability
     {
         BolsterEntity entity = this.target.get(properties);
 
-        if (entity.getBukkit() instanceof ArmorStand)
-        {
-            entity.getBukkit().setHealth(0);
-        }
-        else
-        {
-            entity.getBukkit().damage(1000);
-        }
+        entity.getBukkit().damage(1000);
     }
 
     @Override

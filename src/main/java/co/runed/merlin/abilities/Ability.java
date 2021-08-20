@@ -1,15 +1,15 @@
 package co.runed.merlin.abilities;
 
 import co.runed.bolster.Bolster;
+import co.runed.bolster.common.properties.Properties;
+import co.runed.bolster.common.util.IDescribable;
+import co.runed.bolster.common.util.IIdentifiable;
 import co.runed.bolster.game.Cost;
 import co.runed.bolster.managers.CooldownManager;
-import co.runed.bolster.util.IDescribable;
-import co.runed.bolster.util.IIdentifiable;
 import co.runed.bolster.util.TaskUtil;
 import co.runed.bolster.util.TimeUtil;
 import co.runed.bolster.util.config.IConfigurable;
 import co.runed.bolster.util.cooldown.ICooldownSource;
-import co.runed.bolster.util.properties.Properties;
 import co.runed.merlin.abilities.core.DynamicParameterAbility;
 import co.runed.merlin.abilities.core.FunctionAbility;
 import co.runed.merlin.conditions.Condition;
@@ -48,6 +48,8 @@ public abstract class Ability implements Listener, IIdentifiable, IConfigurable,
     protected List<Condition.Data> conditions = new ArrayList<>();
     List<AbilityTrigger> triggers = new ArrayList<>();
 
+    Ability parent = null;
+
     List<Ability> abilities = new ArrayList<>();
     List<Ability> thenAbilities = new ArrayList<>();
     List<Ability> lastAbilities = new ArrayList<>();
@@ -60,6 +62,7 @@ public abstract class Ability implements Listener, IIdentifiable, IConfigurable,
     int priority = 0;
 
     boolean showErrors = true;
+    boolean showErrorsChanged = false;
     boolean evaluateConditions = true;
     boolean useCosts = true;
     boolean inProgress = false;
@@ -105,7 +108,18 @@ public abstract class Ability implements Listener, IIdentifiable, IConfigurable,
     @Override
     public String getId()
     {
-        return (this.getAbilityProvider() == null ? this.parentId : this.getAbilityProvider().getId()) + "." + this.id;
+        String parentId = this.parentId;
+
+        if (getParent() != null)
+        {
+            parentId = this.parentId;
+        }
+        else if (getAbilityProvider() != null)
+        {
+            parentId = getAbilityProvider().getId();
+        }
+
+        return parentId + "." + this.id;
     }
 
     public Ability id(String id)
@@ -113,6 +127,17 @@ public abstract class Ability implements Listener, IIdentifiable, IConfigurable,
         this.id = id;
 
         return this;
+    }
+
+    /* Parent */
+    public Ability getParent()
+    {
+        return parent;
+    }
+
+    public void setParent(Ability parent)
+    {
+        this.parent = parent;
     }
 
     /* Name */
@@ -550,6 +575,7 @@ public abstract class Ability implements Listener, IIdentifiable, IConfigurable,
     public Ability shouldShowErrorMessages(boolean showErrors)
     {
         this.showErrors = showErrors;
+        this.showErrorsChanged = true;
 
         return this;
     }
@@ -557,7 +583,7 @@ public abstract class Ability implements Listener, IIdentifiable, IConfigurable,
     @Override
     public boolean shouldShowErrorMessages()
     {
-        return this.showErrors;
+        return this.showErrors && (showErrorsChanged || getParent() == null);
     }
 
     /* Cooldowns */
@@ -769,6 +795,7 @@ public abstract class Ability implements Listener, IIdentifiable, IConfigurable,
             var ability = children.get(i);
 
             ability.setCaster(caster);
+            ability.setParent(this);
             ability.charges(this.getCharges());
 
             if (ability.getId() == null)

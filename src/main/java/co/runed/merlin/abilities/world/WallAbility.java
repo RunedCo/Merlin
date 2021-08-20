@@ -2,7 +2,7 @@ package co.runed.merlin.abilities.world;
 
 import co.runed.bolster.common.collection.RandomCollection;
 import co.runed.bolster.util.BukkitUtil;
-import co.runed.bolster.util.properties.Properties;
+import co.runed.bolster.common.properties.Properties;
 import co.runed.merlin.abilities.Ability;
 import co.runed.merlin.target.Target;
 import org.bukkit.Location;

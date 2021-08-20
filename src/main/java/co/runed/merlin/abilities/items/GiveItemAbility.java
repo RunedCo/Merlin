@@ -3,7 +3,7 @@ package co.runed.merlin.abilities.items;
 import co.runed.bolster.Bolster;
 import co.runed.bolster.entity.BolsterEntity;
 import co.runed.bolster.util.Definition;
-import co.runed.bolster.util.properties.Properties;
+import co.runed.bolster.common.properties.Properties;
 import co.runed.merlin.abilities.Ability;
 import co.runed.merlin.conditions.item.CanGiveItemCondition;
 import co.runed.merlin.core.ItemManager;

@@ -166,8 +166,12 @@ public class GuiMilestones extends Gui
                 .clickHandler((p, info) -> {
                     if (this.canAfford() && this.canUpgrade())
                     {
-                        this.item.setLevel(this.item.getLevel() + 1);
+                        int level = this.item.getLevel() + 1;
+
+                        this.item.setLevel(level);
                         this.item.rebuild();
+
+                        PlayerManager.getInstance().getPlayerData(p).setItemLevel(item.getId(), level);
 
                         p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1, 1);
 

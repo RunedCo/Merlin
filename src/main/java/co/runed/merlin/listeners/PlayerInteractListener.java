@@ -1,9 +1,9 @@
 package co.runed.merlin.listeners;
 
-import co.runed.merlin.core.AbilityManager;
-import co.runed.bolster.util.properties.Properties;
+import co.runed.bolster.common.properties.Properties;
 import co.runed.merlin.abilities.AbilityProperties;
 import co.runed.merlin.abilities.AbilityTrigger;
+import co.runed.merlin.core.AbilityManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -33,7 +33,6 @@ public class PlayerInteractListener implements Listener
         properties.set(AbilityProperties.BLOCK_FACE, event.getBlockFace());
         properties.set(AbilityProperties.EVENT, event);
 
-
         AbilityTrigger trigger = null;
 
         if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)
@@ -41,7 +40,9 @@ public class PlayerInteractListener implements Listener
             trigger = event.getAction() == Action.LEFT_CLICK_AIR ? AbilityTrigger.LEFT_CLICK_AIR : AbilityTrigger.LEFT_CLICK_BLOCK;
 
             if (player.isSneaking())
+            {
                 AbilityManager.getInstance().trigger(player, AbilityTrigger.SHIFT_LEFT_CLICK, properties);
+            }
 
             AbilityManager.getInstance().trigger(player, AbilityTrigger.LEFT_CLICK, properties);
         }
@@ -51,7 +52,9 @@ public class PlayerInteractListener implements Listener
             trigger = event.getAction() == Action.RIGHT_CLICK_AIR ? AbilityTrigger.RIGHT_CLICK_AIR : AbilityTrigger.RIGHT_CLICK_BLOCK;
 
             if (player.isSneaking())
+            {
                 AbilityManager.getInstance().trigger(player, AbilityTrigger.SHIFT_RIGHT_CLICK, properties);
+            }
 
             AbilityManager.getInstance().trigger(player, AbilityTrigger.RIGHT_CLICK, properties);
         }

@@ -2,6 +2,10 @@ package co.runed.merlin.items;
 
 import co.runed.bolster.entity.BolsterEntity;
 import co.runed.bolster.util.ItemBuilder;
+import co.runed.merlin.abilities.Ability;
+import co.runed.merlin.abilities.AbilityTrigger;
+import co.runed.merlin.abilities.event.CancelEventAbility;
+import co.runed.merlin.conditions.item.ItemStackIsItemCondition;
 import co.runed.merlin.core.ItemManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -61,7 +65,14 @@ public abstract class Ammunition extends Item
     @Override
     public void create()
     {
+        Ability onClickCancel = Ability.builder()
+                .trigger(AbilityTrigger.ON_CLICK_INVENTORY)
+                .showCooldown(false)
+                .itemMustBeActive(false)
+                .condition(new ItemStackIsItemCondition(this))
+                .ability(new CancelEventAbility());
 
+        this.addAbility(onClickCancel);
     }
 
     public void addAmmo(int amount)

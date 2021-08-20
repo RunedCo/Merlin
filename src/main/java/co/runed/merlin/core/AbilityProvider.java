@@ -1,16 +1,17 @@
 package co.runed.merlin.core;
 
 import co.runed.bolster.Bolster;
+import co.runed.bolster.common.properties.Properties;
+import co.runed.bolster.common.util.IDescribable;
+import co.runed.bolster.common.util.IIdentifiable;
 import co.runed.bolster.entity.BolsterEntity;
 import co.runed.bolster.game.traits.TraitProvider;
 import co.runed.bolster.game.traits.Traits;
 import co.runed.bolster.util.ComponentUtil;
-import co.runed.bolster.util.IDescribable;
-import co.runed.bolster.util.IIdentifiable;
+import co.runed.bolster.util.IIconPreview;
 import co.runed.bolster.util.StringUtil;
 import co.runed.bolster.util.config.ConfigUtil;
 import co.runed.bolster.util.config.IConfigurable;
-import co.runed.bolster.util.properties.Properties;
 import co.runed.bolster.util.registries.DefinitionRegistry;
 import co.runed.bolster.util.registries.Registry;
 import co.runed.merlin.abilities.Ability;
@@ -18,6 +19,9 @@ import co.runed.merlin.abilities.AbilityTrigger;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitTask;
@@ -25,8 +29,9 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
-public abstract class AbilityProvider extends TraitProvider implements IConfigurable, IIdentifiable, IDescribable
+public abstract class AbilityProvider extends TraitProvider implements IConfigurable, IIdentifiable, IDescribable, IIconPreview
 {
     String id = null;
     String name = "";
@@ -40,10 +45,13 @@ public abstract class AbilityProvider extends TraitProvider implements IConfigur
     LivingEntity entity;
     LivingEntity parent;
 
+    private AttributeModifier maxHealthModifier;
+
     public AbilityProvider()
     {
         String id = null;
 
+        // NOTE(Noojuno): This is a complete mess
         for (Registry registry : getType().getRegistries())
         {
             try
@@ -106,11 +114,19 @@ public abstract class AbilityProvider extends TraitProvider implements IConfigur
             String abilityDesc = abilityName + ": " + ChatColor.YELLOW + ability.getDescription();
 
             if (ability.getCooldown() > 0)
+            {
                 abilityDesc += ChatColor.DARK_GRAY + " (" + ability.getCooldown() + "s cooldown)";
+            }
+
             if (ability.getCharges() > 1)
+            {
                 abilityDesc += ChatColor.BLUE + " (" + ability.getCharges() + " charges";
+            }
+
             if (ability.getCastTime() > 0)
+            {
                 abilityDesc += ChatColor.BLUE + " (" + ability.getCastTime() + "s cast time)";
+            }
 
             abilityDescriptions.add(abilityDesc + ChatColor.RESET);
         }
@@ -132,8 +148,21 @@ public abstract class AbilityProvider extends TraitProvider implements IConfigur
 
         double health = this.getTrait(Traits.MAX_HEALTH);
 
-        this.getEntity().setMaxHealth(this.getEntity().getMaxHealth() + health);
-        this.getEntity().setHealth(this.getEntity().getHealth() + health);
+        AttributeInstance healthAttribute = this.getEntity().getAttribute(Attribute.GENERIC_MAX_HEALTH);
+
+        if (healthAttribute != null)
+        {
+            if (maxHealthModifier != null)
+            {
+                healthAttribute.removeModifier(maxHealthModifier);
+            }
+
+            maxHealthModifier = new AttributeModifier(UUID.randomUUID(), "max_health_" + this.getId(), health, AttributeModifier.Operation.ADD_NUMBER);
+
+            healthAttribute.addModifier(maxHealthModifier);
+
+            this.getEntity().setHealth(healthAttribute.getValue());
+        }
     }
 
     public void onDisable()
@@ -141,11 +170,12 @@ public abstract class AbilityProvider extends TraitProvider implements IConfigur
         if (Bolster.getBolsterConfig().debugMode)
             Bolster.getInstance().getLogger().info(ChatColor.stripColor(this.getEntity().getName()) + " (" + this.getEntity().getUniqueId() + ")" + ": " + this.getId() + " disabled");
 
-        double health = this.getEntity().getMaxHealth() - this.getTrait(Traits.MAX_HEALTH);
+        AttributeInstance healthAttribute = this.getEntity().getAttribute(Attribute.GENERIC_MAX_HEALTH);
 
-        if (health <= 0) health = 20;
-
-        this.getEntity().setMaxHealth(health);
+        if (healthAttribute != null && maxHealthModifier != null)
+        {
+            healthAttribute.removeModifier(maxHealthModifier);
+        }
     }
 
     @Override

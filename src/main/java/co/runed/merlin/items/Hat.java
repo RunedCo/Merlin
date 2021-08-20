@@ -1,7 +1,7 @@
 package co.runed.merlin.items;
 
 import co.runed.bolster.entity.BolsterEntity;
-import co.runed.bolster.util.properties.Properties;
+import co.runed.bolster.common.properties.Properties;
 import co.runed.merlin.abilities.Ability;
 import co.runed.merlin.abilities.AbilityProperties;
 import co.runed.merlin.abilities.AbilityTrigger;
