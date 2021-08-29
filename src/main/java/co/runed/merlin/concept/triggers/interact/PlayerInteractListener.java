@@ -1,7 +1,6 @@
 package co.runed.merlin.concept.triggers.interact;
 
-import co.runed.merlin.concept.spells.Spells;
-import org.bukkit.entity.Player;
+import co.runed.merlin.concept.spells.SpellManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -17,10 +16,10 @@ public class PlayerInteractListener implements Listener {
     private void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) return;
 
-        Player player = event.getPlayer();
+        var player = event.getPlayer();
 
         if (event.getAction() == Action.PHYSICAL) return;
 
-        Spells.getInstance().run(player, InteractTrigger.class, (spell, context) -> spell.onClick(context, new InteractParams(event)));
+        SpellManager.getInstance().run(player, InteractTrigger.class, (spell, context) -> spell.onClick(context.setEvent(event), new InteractParams(event)));
     }
 }

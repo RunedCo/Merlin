@@ -8,11 +8,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.jetbrains.annotations.NotNull;
 
 public class InteractParams extends AbstractItemEventParams<PlayerInteractEvent> {
+
     public InteractParams(PlayerInteractEvent event) {
-        super(event, event.getItem(), event.getHand());
+        super(event, event.getItem());
     }
 
     public Player getPlayer() {
@@ -63,5 +65,9 @@ public class InteractParams extends AbstractItemEventParams<PlayerInteractEvent>
 
     public void setUseItemInHand(@NotNull Event.Result useItemInHand) {
         getBaseEvent().setUseItemInHand(useItemInHand);
+    }
+
+    public EquipmentSlot getEquipmentSlot() {
+        return getBaseEvent().getHand();
     }
 }

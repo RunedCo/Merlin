@@ -7,19 +7,33 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public abstract class Target<T> implements Iterable<T> {
     private List<T> _cachedValue = null;
 
-    Supplier<Collection<T>> ignoreTargets = ArrayList::new;
+    private Supplier<Collection<T>> ignoreTargets = ArrayList::new;
+    private Collection<Function<T, Boolean>> ignoreFunctions = new ArrayList<>();
 
     abstract Collection<T> getTargets();
 
     private Collection<T> getFilteredTargets() {
-        Collection<T> ignored = ignoreTargets.get();
+        var ignored = ignoreTargets.get();
 
-        return getTargets().stream().filter(t -> !ignored.contains(t)).toList();
+        var out = getTargets().stream().filter(t -> !ignored.contains(t));
+
+        for (var func : ignoreFunctions) {
+            out = out.filter(t -> !func.apply(t));
+        }
+
+        return out.toList();
+    }
+
+    public Target<T> ignoreIf(Function<T, Boolean> ignoreFunction) {
+        this.ignoreFunctions.add(ignoreFunction);
+
+        return this;
     }
 
     public Target<T> ignoreIf(Supplier<Collection<T>> ignoreTargets) {
@@ -29,7 +43,7 @@ public abstract class Target<T> implements Iterable<T> {
     }
 
     public Target<T> run(Consumer<T> consumer) {
-        for (T target : getFilteredTargets()) {
+        for (var target : getFilteredTargets()) {
             consumer.accept(target);
         }
 

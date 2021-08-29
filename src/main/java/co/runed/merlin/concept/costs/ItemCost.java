@@ -2,34 +2,50 @@ package co.runed.merlin.concept.costs;
 
 import co.runed.merlin.concept.CastContext;
 import co.runed.merlin.concept.items.ItemDefinition;
+import co.runed.merlin.concept.items.ItemManager;
 import co.runed.merlin.concept.spells.CastResult;
+import org.bukkit.GameMode;
+import org.bukkit.entity.Player;
 
 public class ItemCost extends Cost {
-    int amount = 1;
-    ItemDefinition item = null;
+    private int amount = 1;
+    private ItemDefinition item = null;
 
     public ItemCost(int amount, ItemDefinition item) {
-        this(amount);
+        super();
 
+        this.amount = amount;
         this.item = item;
     }
 
     public ItemCost(int amount) {
-        super();
-
-        this.amount = amount;
+        this(amount, null);
     }
 
     @Override
     public CastResult evaluate(CastContext context) {
-        if (item == null) item = context.getItem();
+        var entity = context.getCaster().getEntity();
+
+        if (item == null) item = context.getItem().getDefinition();
         if (item == null) return CastResult.fail();
+
+        if (!ItemManager.getInstance().anyInventoryContainsAtLeast(entity, item, amount)) return CastResult.fail();
 
         return CastResult.success();
     }
 
     @Override
     public void run(CastContext context) {
+        var caster = context.getCaster();
 
+        if (caster.getEntity() instanceof Player player && player.getGameMode() == GameMode.CREATIVE) return;
+
+        if (item == null) return;
+
+        for (var inv : caster.toBolster().getInventories()) {
+            var success = ItemManager.getInstance().removeItem(inv, item, amount);
+
+            if (success) return;
+        }
     }
 }

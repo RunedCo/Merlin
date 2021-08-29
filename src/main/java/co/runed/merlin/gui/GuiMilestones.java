@@ -6,7 +6,7 @@ import co.runed.bolster.gui.Gui;
 import co.runed.bolster.gui.GuiConstants;
 import co.runed.bolster.managers.PlayerManager;
 import co.runed.bolster.util.ItemBuilder;
-import co.runed.merlin.items.LevelableItem;
+import co.runed.merlin.concept.items.ItemDefinition;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -14,49 +14,41 @@ import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.ipvp.canvas.Menu;
 import org.ipvp.canvas.mask.BinaryMask;
-import org.ipvp.canvas.mask.Mask;
 import org.ipvp.canvas.paginate.PaginatedMenuBuilder;
 import org.ipvp.canvas.slot.SlotSettings;
 import org.ipvp.canvas.template.StaticItemTemplate;
 import org.ipvp.canvas.type.ChestMenu;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class GuiMilestones extends Gui
-{
+public class GuiMilestones extends Gui {
     PlayerData playerData;
     Player player;
-    LevelableItem item;
+    ItemDefinition item;
     Map<Currency, Integer> costs = new HashMap<>();
 
-    public GuiMilestones(Gui prevGui, LevelableItem item)
-    {
+    public GuiMilestones(Gui prevGui, ItemDefinition item) {
         super(prevGui);
 
         this.item = item;
     }
 
     @Override
-    public String getTitle(Player player)
-    {
+    public String getTitle(Player player) {
         return "Milestones for " + item.getName();
     }
 
     @Override
-    protected Menu draw(Player player)
-    {
-        ChestMenu.Builder pageTemplate = ChestMenu.builder(6)
-                .title(this.getTitle(player))
+    protected Menu draw(Player player) {
+        var pageTemplate = ChestMenu.builder(6)
+                .title(getTitle(player))
                 .redraw(true);
 
-        Mask milestoneMask = BinaryMask.builder(pageTemplate.getDimensions())
+        var milestoneMask = BinaryMask.builder(pageTemplate.getDimensions())
                 .pattern("000000000")
                 .pattern("000000000")
                 .pattern("000000000")
@@ -65,20 +57,18 @@ public class GuiMilestones extends Gui
                 .pattern("000000000")
                 .build();
 
-        PaginatedMenuBuilder builder = PaginatedMenuBuilder.builder(pageTemplate)
+        var builder = PaginatedMenuBuilder.builder(pageTemplate)
                 .slots(milestoneMask);
 
-        this.player = player;
-        this.playerData = PlayerManager.getInstance().getPlayerData(player);
+        player = player;
+        playerData = PlayerManager.getInstance().getPlayerData(player);
 
-        Collection<LevelableItem.MilestoneData> milestones = item.getMilestones().values().stream().sorted((m, m2) -> m.getLevel() - m2.getLevel()).collect(Collectors.toList());
+        var milestones = item.getMilestones().values().stream().sorted((m, m2) -> m.getLevel() - m2.getLevel()).collect(Collectors.toList());
 
-        for (LevelableItem.MilestoneData milestone : milestones)
-        {
-            ItemBuilder milestoneIcon = new ItemBuilder(milestone.getIcon());
+        for (var milestone : milestones) {
+            var milestoneIcon = new ItemBuilder(milestone.getIcon());
 
-            if (this.item.getLevel() < milestone.getLevel())
-            {
+            if (item.getMaxLevel() < milestone.getLevel()) {
                 milestoneIcon = new ItemBuilder(GuiConstants.GUI_LOCK)
                         .setDisplayName(Component.text(milestone.getName(), NamedTextColor.GOLD))
                         .setLoreComponent(milestone.getIcon().getItemMeta().lore())
@@ -86,96 +76,86 @@ public class GuiMilestones extends Gui
                         .addLoreComponent(Component.text("Unlocks at Level " + milestone.getLevel(), NamedTextColor.RED, TextDecoration.BOLD));
             }
 
-            SlotSettings settings = SlotSettings.builder()
+            var settings = SlotSettings.builder()
                     .itemTemplate(new StaticItemTemplate(milestoneIcon.build()))
                     .build();
 
             builder.addItem(settings);
         }
 
-        List<Menu> pages = builder.build();
+        var pages = builder.build();
 
-        for (Menu page : pages)
-        {
-            this.drawBase(page);
+        for (var page : pages) {
+            drawBase(page);
         }
 
         return pages.get(0);
     }
 
-    public void drawBase(Menu menu)
-    {
-        Mask milestoneMask = BinaryMask.builder(menu.getDimensions())
+    public void drawBase(Menu menu) {
+        var milestoneMask = BinaryMask.builder(menu.getDimensions())
                 .pattern("111111111")
                 .pattern("111111111")
                 .item(GuiConstants.GUI_DIVIDER)
                 .build();
 
-        ItemStack baseIcon = this.item.getIcon();
-        List<Component> stats = this.item.getStatsLore();
-        ItemBuilder builder = new ItemBuilder(baseIcon.getType())
+        var level = item.getLevel(player);
+        var itemInstance = item.createAtLevel(level);
+
+        var baseIcon = itemInstance.getIcon();
+        var stats = itemInstance.getStatsLore();
+
+        var builder = new ItemBuilder(baseIcon.getType())
                 .setDisplayName(baseIcon.getItemMeta().displayName())
                 .addItemFlags(baseIcon.getItemMeta().getItemFlags());
 
-        if (stats.size() > 0)
-        {
+        if (stats.size() > 0) {
             builder = builder.addLoreComponent(stats)
                     .addLore("");
         }
 
-        builder = builder.addLore(ChatColor.WHITE + this.item.getConfig().getString("unlock-tooltip", ""));
+        builder = builder.addLore(ChatColor.WHITE + item.getConfig().getString("unlock-tooltip", ""));
 
-        if (this.canUpgrade())
-        {
-            List<String> stringCosts = this.item.getUnmergedLevels()
-                    .get(this.item.getLevel() + 1)
+        if (canUpgrade()) {
+            var stringCosts = item.getUnmergedLevels()
+                    .get(item.getLevel(player) + 1)
                     .getStringList("cost");
 
-            this.costs = Currency.fromList(stringCosts);
+            costs = Currency.fromList(stringCosts);
 
             builder = builder.addLore("")
                     .addLore(ChatColor.WHITE + "Next Level:");
 
-            for (String tip : this.item.getUpgradeTooltip(this.item.getLevel() + 1))
-            {
+            for (var tip : item.getUpgradeTooltip(level + 1)) {
                 builder = builder.addBullet(ChatColor.GRAY + tip);
             }
 
             builder = builder.addLore("")
                     .addLore(ChatColor.WHITE + "Cost to Level Up:");
 
-            for (Map.Entry<Currency, Integer> cost : this.costs.entrySet())
-            {
-                builder = builder.addBullet((canAfford(this.player, cost.getKey(), cost.getValue()) ? ChatColor.GREEN : ChatColor.RED) + (cost.getValue() + " " + cost.getKey().getPluralisedName()));
+            for (var cost : costs.entrySet()) {
+                builder = builder.addBullet((canAfford(player, cost.getKey(), cost.getValue()) ? ChatColor.GREEN : ChatColor.RED) + (cost.getValue() + " " + cost.getKey().getPluralisedName()));
             }
 
             builder = builder.addLore("");
 
-            if (!this.canAfford())
-            {
+            if (!canAfford()) {
                 builder = builder.addLore(GuiConstants.CANNOT_AFFORD_TO + "to level up!");
             }
-            else
-            {
+            else {
                 builder = builder.addLore(GuiConstants.CLICK_TO + "level up!");
             }
         }
 
-        SlotSettings settings = SlotSettings.builder()
+        var settings = SlotSettings.builder()
                 .itemTemplate(new StaticItemTemplate(builder.build()))
                 .clickHandler((p, info) -> {
-                    if (this.canAfford() && this.canUpgrade())
-                    {
-                        int level = this.item.getLevel() + 1;
-
-                        this.item.setLevel(level);
-                        this.item.rebuild();
-
-                        PlayerManager.getInstance().getPlayerData(p).setItemLevel(item.getId(), level);
+                    if (canAfford() && canUpgrade()) {
+                        PlayerManager.getInstance().getPlayerData(p).setProviderLevel(item.getId(), item.getLevel(p) + 1);
 
                         p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1, 1);
 
-                        this.show(p);
+                        show(p);
                     }
                 })
                 .build();
@@ -185,18 +165,15 @@ public class GuiMilestones extends Gui
         menu.getSlot(4).setSettings(settings);
     }
 
-    private boolean canUpgrade()
-    {
-        return this.item.getLevel() < this.item.getMaxLevel();
+    private boolean canUpgrade() {
+        return item.getLevel(player) < item.getMaxLevel();
     }
 
-    private boolean canAfford()
-    {
-        return this.costs.entrySet().stream().allMatch((cost) -> canAfford(this.player, cost.getKey(), cost.getValue()));
+    private boolean canAfford() {
+        return costs.entrySet().stream().allMatch((cost) -> canAfford(player, cost.getKey(), cost.getValue()));
     }
 
-    public boolean canAfford(Player player, Currency currency, int amount)
-    {
+    public boolean canAfford(Player player, Currency currency, int amount) {
         return PlayerManager.getInstance().getPlayerData(player).getCurrency(currency) >= amount;
     }
 }

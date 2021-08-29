@@ -3,12 +3,10 @@ package co.runed.merlin.commands;
 import co.runed.bolster.commands.CommandBase;
 import co.runed.bolster.managers.PlayerManager;
 import co.runed.bolster.util.Category;
-import co.runed.bolster.util.Definition;
 import co.runed.bolster.util.registries.Registry;
-import co.runed.merlin.core.ItemManager;
-import co.runed.merlin.core.MerlinRegistries;
-import co.runed.merlin.items.Item;
-import co.runed.merlin.items.LevelableItem;
+import co.runed.merlin.concept.MerlinRegistries;
+import co.runed.merlin.concept.items.ItemDefinition;
+import co.runed.merlin.concept.items.ItemManager;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.PlayerArgument;
@@ -18,26 +16,20 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.List;
 
-public class CommandItems extends CommandBase
-{
-    public CommandItems()
-    {
+public class CommandItems extends CommandBase {
+    public CommandItems() {
         super("items");
     }
 
-    private String[] getSuggestions(CommandSender sender)
-    {
+    private String[] getSuggestions(CommandSender sender) {
         return MerlinRegistries.ITEMS.getEntries().values().stream().map(Registry.Entry::getId).toArray(String[]::new);
     }
 
-    private String[] getLevelableSuggections(CommandSender sender)
-    {
-        List<String> items = new ArrayList<>();
+    private String[] getLevelableSuggections(CommandSender sender) {
+        var items = new ArrayList<>();
 
-        for (Registry.Entry<? extends Definition<Item>> item : MerlinRegistries.ITEMS.getEntries().values())
-        {
+        for (var item : MerlinRegistries.ITEMS.getEntries().values()) {
             if (!item.getCategories().contains(Category.LEVELABLE)) continue;
 
             items.add(item.getId());
@@ -47,8 +39,7 @@ public class CommandItems extends CommandBase
     }
 
     @Override
-    public CommandAPICommand build()
-    {
+    public CommandAPICommand build() {
         return new CommandAPICommand(this.command)
                 .withPermission("bolster.commands.items")
                 .withSubcommand(new CommandAPICommand("give")
@@ -58,11 +49,12 @@ public class CommandItems extends CommandBase
                                 new IntegerArgument("amount", 0)
                         )
                         .executes((sender, args) -> {
-                            Player player = (Player) args[0];
-                            String id = (String) args[1];
-                            int amount = (int) args[2];
+                            var player = (Player) args[0];
+                            var id = (String) args[1];
+                            var amount = (int) args[2];
+                            var itemDef = MerlinRegistries.ITEMS.get(id);
 
-                            Item item = ItemManager.getInstance().giveItem(player, player.getInventory(), id, amount);
+                            var item = ItemManager.getInstance().giveItem(player, player.getInventory(), itemDef, amount);
 
                             sender.sendMessage("Gave " + amount + " " + item.getName() + " to " + player.getDisplayName());
                         })
@@ -74,17 +66,16 @@ public class CommandItems extends CommandBase
                                 new IntegerArgument("amount", 0)
                         )
                         .executes((sender, args) -> {
-                            Player player = (Player) args[0];
-                            String id = (String) args[1];
-                            int amount = (int) args[2];
+                            var player = (Player) args[0];
+                            var id = (String) args[1];
+                            var amount = (int) args[2];
+                            var itemDef = MerlinRegistries.ITEMS.get(id);
 
-                            int amountInInv = ItemManager.getInstance().getItemCount(player.getInventory(), id);
+                            var amountInInv = ItemManager.getInstance().getItemCount(player.getInventory(), itemDef);
 
-                            Item item = ItemManager.getInstance().createItem(player, id);
+                            ItemManager.getInstance().removeItem(player.getInventory(), itemDef, amount);
 
-                            ItemManager.getInstance().removeItem(player.getInventory(), item, amount);
-
-                            sender.sendMessage("Removed " + Math.min(amountInInv, amount) + " " + item.getName() + " from " + player.getDisplayName());
+                            sender.sendMessage("Removed " + Math.min(amountInInv, amount) + " " + itemDef.getName() + " from " + player.getDisplayName());
                         })
                 )
                 .withSubcommand(new CommandAPICommand("clear")
@@ -93,14 +84,13 @@ public class CommandItems extends CommandBase
                                 new StringArgument("item_id").overrideSuggestions(this::getSuggestions)
                         )
                         .executes((sender, args) -> {
-                            Player player = (Player) args[0];
-                            String id = (String) args[1];
+                            var player = (Player) args[0];
+                            var id = (String) args[1];
+                            var itemDef = MerlinRegistries.ITEMS.get(id);
 
-                            Item item = ItemManager.getInstance().createItem(player, id);
+                            ItemManager.getInstance().removeItem(player.getInventory(), itemDef, Integer.MAX_VALUE);
 
-                            ItemManager.getInstance().removeItem(player.getInventory(), item, Integer.MAX_VALUE);
-
-                            sender.sendMessage("Cleared all " + item.getName() + " from " + player.getDisplayName());
+                            sender.sendMessage("Cleared all " + itemDef.getName() + " from " + player.getDisplayName());
                         })
                 )
                 .withSubcommand(new CommandAPICommand("setlevel")
@@ -110,35 +100,31 @@ public class CommandItems extends CommandBase
                                 new IntegerArgument("amount", 0)
                         )
                         .executes((sender, args) -> {
-                            Player player = (Player) args[0];
-                            String id = (String) args[1];
-                            int level = (int) args[2];
+                            var player = (Player) args[0];
+                            var id = (String) args[1];
+                            var level = (int) args[2];
 
-                            if (!MerlinRegistries.ITEMS.contains(id))
-                            {
+                            if (!MerlinRegistries.ITEMS.contains(id)) {
                                 sender.sendMessage("Invalid item id '" + id + "'");
                                 return;
                             }
 
-                            Item item = MerlinRegistries.ITEMS.get(id).create();
+                            var plainDef = MerlinRegistries.ITEMS.get(id);
 
-                            if (item instanceof LevelableItem)
-                            {
-                                LevelableItem fetchedItem = (LevelableItem) ItemManager.getInstance().getItem(player, id);
+                            if (plainDef instanceof ItemDefinition itemDef && itemDef.getMaxLevel() > 0) {
+                                var fetchedItem = ItemManager.getInstance().getOrCreate(player, itemDef);
 
-                                PlayerManager.getInstance().getPlayerData(player).setItemLevel(id, level);
+                                PlayerManager.getInstance().getPlayerData(player).setProviderLevel(id, level);
 
-                                if (fetchedItem != null)
-                                {
+                                if (fetchedItem != null) {
                                     fetchedItem.setLevel(level);
                                     fetchedItem.rebuild();
                                 }
 
-                                sender.sendMessage("Set " + item.getName() + "'s level to " + Math.min(level, ((LevelableItem) item).getMaxLevel()) + " for player " + player.getDisplayName());
+                                sender.sendMessage("Set " + itemDef.getName() + "'s level to " + Math.min(level, itemDef.getMaxLevel()) + " for player " + player.getDisplayName());
                             }
-                            else
-                            {
-                                sender.sendMessage(item.getName() + ChatColor.WHITE + " is not an item that can be leveled.");
+                            else {
+                                sender.sendMessage(id + ChatColor.WHITE + " is not an item that can be leveled.");
                             }
                         })
                 );

@@ -30,6 +30,7 @@ public class CastResult {
         return this.result == Result.SUCCESS || this.result == Result.SKIP;
     }
 
+    /* Success! Continue and consume costs */
     public static CastResult success() {
         return CastResult.success(null);
     }

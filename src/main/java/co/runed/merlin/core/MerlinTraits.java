@@ -3,8 +3,7 @@ package co.runed.merlin.core;
 import co.runed.bolster.common.math.Operation;
 import co.runed.bolster.game.traits.Trait;
 
-public class MerlinTraits
-{
+public class MerlinTraits {
     /* Merlin Traits */
     public static final Trait<Float> MANA_PER_SECOND = new Trait<>("mana_per_second", 10f, Operation.ADD);
     public static final Trait<Double> SPELL_DAMAGE = new Trait<>("spell_damage", 0.0d, Operation.ADD);

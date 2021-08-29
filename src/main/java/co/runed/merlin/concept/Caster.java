@@ -3,20 +3,19 @@ package co.runed.merlin.concept;
 import co.runed.bolster.damage.DamageSource;
 import co.runed.bolster.entity.BolsterEntity;
 import co.runed.merlin.concept.items.ItemDefinition;
-import co.runed.merlin.concept.spells.Spell;
-import co.runed.merlin.concept.spells.Spells;
-import co.runed.merlin.concept.triggers.lifecycle.DisableTrigger;
-import co.runed.merlin.concept.triggers.lifecycle.EnableTrigger;
+import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EquipmentSlot;
 
-import java.util.*;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class Caster implements DamageSource {
     private static final Map<UUID, Caster> _casters = new HashMap<>();
 
     private LivingEntity entity;
-    private final Set<Spell> spells = new HashSet<>();
 
     public Caster(LivingEntity entity) {
         this.entity = entity;
@@ -30,29 +29,49 @@ public class Caster implements DamageSource {
         this.entity = entity;
     }
 
-    public void enableSpell(Spell spell) {
-        spells.add(spell);
-        spell.setOwner(entity);
-
-        Spells.getInstance().run(getEntity(), EnableTrigger.class, (_spell, _context) -> ((EnableTrigger) _spell).onEnable(_context));
+    public Location getLocation() {
+        return getEntity().getLocation();
     }
 
-    public void disableSpell(Spell spell) {
-        Spells.getInstance().run(getEntity(), DisableTrigger.class, (_spell, _context) -> ((DisableTrigger) _spell).onDisable(_context));
-
-        spells.remove(spell);
-        spell.destroy();
+    public Location getEyeLocation() {
+        return getEntity().getEyeLocation();
     }
 
-    public boolean isHolding(ItemDefinition container) {
-        return isEquipped(container, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
+//    public void addSpell(Spell spell) {
+//        spells.add(spell);
+//
+//        if (spell.isEnabled()) return;
+//
+//        spell.setOwner(entity);
+//        spell.setEnabled(true);
+//
+//        SpellManager.getInstance().run(getEntity(), EnableTrigger.class, EnableTrigger::onEnable);
+//    }
+//
+//    public void disableSpell(Spell spell) {
+//        spell.setEnabled(false);
+//    }
+//
+//    public void removeSpell(Spell spell) {
+//        SpellManager.getInstance().run(getEntity(), DisableTrigger.class, DisableTrigger::onDisable);
+//
+//        spells.remove(spell);
+//        spell.destroy();
+//    }
+
+    public boolean isHolding(ItemDefinition definition) {
+        return isEquipped(definition, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
     }
 
-    public boolean isEquipped(ItemDefinition container) {
-        return isEquipped(container, EnumSet.allOf(EquipmentSlot.class).toArray(new EquipmentSlot[0]));
+    public boolean isArmor(ItemDefinition definition) {
+        return isEquipped(definition, EquipmentSlot.CHEST, EquipmentSlot.FEET, EquipmentSlot.HEAD, EquipmentSlot.LEGS);
     }
 
-    public boolean isEquipped(ItemDefinition container, EquipmentSlot... slots) {
+    public boolean isEquipped(ItemDefinition definition) {
+        return isEquipped(definition, EnumSet.allOf(EquipmentSlot.class).toArray(new EquipmentSlot[0]));
+    }
+
+    public boolean isEquipped(ItemDefinition definition, EquipmentSlot... slots) {
         var entity = getEntity();
         var equipment = entity.getEquipment();
 
@@ -61,18 +80,35 @@ public class Caster implements DamageSource {
         for (var slot : slots) {
             var item = ItemDefinition.from(equipment.getItem(slot));
 
-            if (container.equals(item)) return true;
+            if (definition.equals(item)) return true;
         }
 
         return false;
     }
 
+    public BolsterEntity toBolster() {
+        return BolsterEntity.from(getEntity());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof LivingEntity entity) {
+            return entity.getUniqueId().equals(this.getEntity().getUniqueId());
+        }
+
+        if (obj instanceof BolsterEntity entity) {
+            return entity.getUniqueId().equals(this.getEntity().getUniqueId());
+        }
+
+        return super.equals(obj);
+    }
+
     public static Caster from(BolsterEntity entity) {
-        return from(entity.getBukkit());
+        return from(entity.getEntity());
     }
 
     public static Caster from(LivingEntity entity) {
-        Caster caster = from(entity.getUniqueId());
+        var caster = from(entity.getUniqueId());
 
         if (caster == null) caster = new Caster(entity);
 
