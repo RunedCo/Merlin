@@ -1,6 +1,6 @@
 package co.runed.merlin.core;
 
-import co.runed.bolster.common.math.Operation;
+import co.runed.dayroom.math.Operation;
 import co.runed.bolster.game.traits.Trait;
 
 public class MerlinTraits {

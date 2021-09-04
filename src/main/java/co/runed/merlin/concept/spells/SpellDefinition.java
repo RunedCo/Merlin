@@ -1,6 +1,6 @@
 package co.runed.merlin.concept.spells;
 
-import co.runed.bolster.common.util.Describable;
+import co.runed.dayroom.util.Describable;
 import co.runed.bolster.util.Category;
 import co.runed.bolster.util.registries.Definition;
 import co.runed.bolster.util.registries.Registry;

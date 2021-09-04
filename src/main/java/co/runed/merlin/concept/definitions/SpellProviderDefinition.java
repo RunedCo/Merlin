@@ -1,6 +1,6 @@
 package co.runed.merlin.concept.definitions;
 
-import co.runed.bolster.common.properties.Properties;
+import co.runed.dayroom.properties.Properties;
 import co.runed.bolster.game.traits.Trait;
 import co.runed.bolster.managers.PlayerManager;
 import co.runed.bolster.util.ItemBuilder;

@@ -1,6 +1,6 @@
 package co.runed.merlin.items;
 
-import co.runed.bolster.common.util.Identifiable;
+import co.runed.dayroom.util.Identifiable;
 import co.runed.bolster.util.ItemBuilder;
 import co.runed.bolster.util.config.Configurable;
 import co.runed.merlin.concept.items.ItemManager;

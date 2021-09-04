@@ -1,9 +1,9 @@
 package co.runed.merlin.concept.spells;
 
-import co.runed.bolster.common.util.Describable;
-import co.runed.bolster.common.util.Enableable;
-import co.runed.bolster.common.util.Identifiable;
-import co.runed.bolster.common.util.Nameable;
+import co.runed.dayroom.util.Describable;
+import co.runed.dayroom.util.Enableable;
+import co.runed.dayroom.util.Identifiable;
+import co.runed.dayroom.util.Nameable;
 import co.runed.bolster.damage.DamageInfo;
 import co.runed.bolster.damage.DamageSource;
 import co.runed.bolster.managers.CooldownManager;
