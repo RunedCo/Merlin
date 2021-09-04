@@ -1,7 +1,7 @@
 package co.runed.merlin.core;
 
 import co.runed.bolster.events.entity.EntityCleanupEvent;
-import co.runed.bolster.util.Manager;
+import co.runed.bolster.managers.Manager;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;

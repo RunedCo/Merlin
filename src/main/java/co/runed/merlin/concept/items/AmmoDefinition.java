@@ -4,7 +4,6 @@ import co.runed.bolster.util.registries.Definition;
 import co.runed.merlin.concept.items.ammo.BaseAmmoSpell;
 import co.runed.merlin.concept.spells.SpellDefinition;
 import co.runed.merlin.concept.spells.SpellOption;
-import co.runed.merlin.concept.spells.SpellType;
 
 import java.util.function.Function;
 
@@ -19,9 +18,9 @@ public class AmmoDefinition extends ItemDefinition {
     public AmmoDefinition(String id, Function<AmmoDefinition, AmmoImpl> supplier) {
         super(id, (definition -> supplier.apply((AmmoDefinition) definition)));
 
-        this.addSpell(BASE_AMMO_SPELL, SpellType.NORMAL, ItemRequirement.ALWAYS);
+        this.addSpell(BASE_AMMO_SPELL, ItemRequirement.ALWAYS);
     }
-
+    
     @Override
     public AmmoDefinition setName(String name) {
         return (AmmoDefinition) super.setName(name);

@@ -16,6 +16,8 @@ import co.runed.bolster.util.config.Configurable;
 import co.runed.merlin.concept.CastContext;
 import co.runed.merlin.concept.definitions.SpellProviderDefinition;
 import co.runed.merlin.core.SpellProviderType;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -23,6 +25,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 public abstract class SpellProvider extends TraitProvider implements Identifiable, Nameable, Describable, Configurable, Owned, Enableable, DamageSource, IconPreview {
     public static final String CONFIG_KEY_HEALTH = "health";
@@ -31,10 +34,11 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
     private final SpellProviderDefinition<?> definition;
     private LivingEntity entity;
     private final List<Spell> spells = new ArrayList<>();
-    private int level = 0;
+    private int level = -1;
     private int temporaryLevel = -1;
     private String name;
     private String description;
+    private AttributeModifier maxHealthModifier;
 
     public SpellProvider(SpellProviderDefinition<?> definition) {
         this.definition = definition;
@@ -48,6 +52,46 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
     @Override
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+
+        if (this.isEnabled() != enabled && this.getOwner() != null) {
+
+            // On Disable
+            if (!enabled) {
+                this.onDisable();
+            }
+
+            // On Enable
+            if (enabled) {
+                this.onEnable();
+
+            }
+        }
+    }
+
+    public void onEnable() {
+        var attribute = getOwner().getAttribute(Attribute.GENERIC_MAX_HEALTH);
+
+        if (attribute != null) {
+            if (maxHealthModifier != null) {
+                attribute.removeModifier(maxHealthModifier);
+            }
+
+            maxHealthModifier = new AttributeModifier(UUID.randomUUID(), getId() + "_max_health", getTrait(Traits.MAX_HEALTH), AttributeModifier.Operation.ADD_NUMBER);
+
+            attribute.addModifier(maxHealthModifier);
+        }
+    }
+
+    public void onDisable() {
+        var attribute = getOwner().getAttribute(Attribute.GENERIC_MAX_HEALTH);
+
+        if (attribute != null) {
+            if (maxHealthModifier != null) {
+                attribute.removeModifier(maxHealthModifier);
+            }
+
+            maxHealthModifier = null;
+        }
     }
 
     public void addSpell(Spell spell) {
@@ -122,6 +166,10 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
 
         this.entity = entity;
 
+        for (var spell : spells) {
+            spell.setOwner(entity);
+        }
+
         if (entity == null) return;
 
         BolsterEntity.from(entity).addTraitProvider(this);
@@ -131,7 +179,7 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
 
             if (temporaryLevel > -1) level = temporaryLevel;
 
-            setLevel(level, temporaryLevel > -1);
+            if (level != getLevel()) setLevel(level, temporaryLevel > -1);
         }
     }
 

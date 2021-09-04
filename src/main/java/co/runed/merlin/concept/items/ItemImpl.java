@@ -85,6 +85,8 @@ public class ItemImpl extends SpellProvider implements DamageSource {
         if (context.getSpell().hasOption(SpellOption.SHOW_COOLDOWN)) {
             // TODO SHOW ITEM COOLDOWN
         }
+
+        this.rebuild();
     }
 
     @Override
@@ -156,7 +158,7 @@ public class ItemImpl extends SpellProvider implements DamageSource {
 
     public ItemStack toItemStack() {
         var builder = new ItemBuilder(getDefinition().getBaseItemStack())
-                .setDisplayName(Component.text(getName()))
+                .setDisplayName(Component.text(ChatColor.WHITE + getName()))
                 .setPersistentData(ItemManager.ITEM_ID_KEY, PersistentDataType.STRING, this.getId())
                 .setUnbreakable(true)
                 .addItemFlag(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_UNBREAKABLE);

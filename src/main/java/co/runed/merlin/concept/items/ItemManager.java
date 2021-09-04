@@ -2,7 +2,7 @@ package co.runed.merlin.concept.items;
 
 import co.runed.bolster.entity.BolsterEntity;
 import co.runed.bolster.events.player.LoadPlayerDataEvent;
-import co.runed.bolster.util.Manager;
+import co.runed.bolster.managers.Manager;
 import co.runed.bolster.util.registries.Definition;
 import co.runed.merlin.Merlin;
 import co.runed.merlin.concept.MerlinRegistries;
@@ -24,6 +24,7 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -172,17 +173,27 @@ public class ItemManager extends Manager {
         }
     }
 
-    ItemStack getFirstItemStack(Inventory inventory, Definition<ItemImpl> itemDef) {
+    public List<ItemStack> getAllItemStacks(Inventory inventory, Definition<ItemImpl> itemDef) {
+        var out = new ArrayList<ItemStack>();
+
         if (itemDef != null) {
             for (var stack : inventory) {
                 var stackId = getIdFromStack(stack);
                 var itemId = itemDef.getId();
 
-                if (itemId.equals(stackId)) return stack;
+                if (itemId.equals(stackId)) out.add(stack);
             }
         }
 
-        return new ItemStack(Material.AIR);
+        return out;
+    }
+
+    public ItemStack getFirstItemStack(Inventory inventory, Definition<ItemImpl> itemDef) {
+        var allStacks = getAllItemStacks(inventory, itemDef);
+
+        if (allStacks.size() <= 0) return new ItemStack(Material.AIR);
+
+        return allStacks.get(0);
     }
 
     public void clearItem(LivingEntity entity, Definition<ItemImpl> itemDef) {

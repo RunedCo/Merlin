@@ -25,7 +25,7 @@ public enum ItemRequirement {
     EQUIPPED((ctx) -> ctx.getCaster().isEquipped(ctx.getItem().getDefinition())),
 
     // Item is anywhere in inventory
-    INVENTORY((ctx) -> true);
+    INVENTORY((ctx) -> ItemManager.getInstance().anyInventoryContainsAtLeast(ctx.getCasterEntity(), ctx.getItem().getDefinition(), 1));
 
     private final Function<CastContext, Boolean> evaluate;
 

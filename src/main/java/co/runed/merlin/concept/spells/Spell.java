@@ -10,8 +10,11 @@ import co.runed.bolster.managers.CooldownManager;
 import co.runed.bolster.util.Owned;
 import co.runed.bolster.util.config.Configurable;
 import co.runed.bolster.util.cooldown.CooldownSource;
+import co.runed.merlin.Merlin;
 import co.runed.merlin.concept.CastContext;
 import co.runed.merlin.concept.costs.Cost;
+import co.runed.merlin.concept.spells.type.SpellType;
+import co.runed.merlin.concept.spells.type.ToggleSpellType;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -25,11 +28,13 @@ public abstract class Spell implements Identifiable, Nameable, Describable, Conf
 
     private boolean enabled = true;
     private boolean initialised = false;
-    private String cooldownId;
+    private String cooldownId = null;
 
     private double cooldown = 0;
-    int charges = 1;
-    int priority = 1;
+    private int charges = 1;
+    private int priority = 1;
+    private SpellType spellType;
+    private boolean toggled = false;
 
     private LivingEntity owner;
     private SpellProvider parent;
@@ -79,7 +84,7 @@ public abstract class Spell implements Identifiable, Nameable, Describable, Conf
         var parentResult = getParent().preCast(context);
         if (!parentResult.isSuccess()) return parentResult;
 
-        if (isOnCooldown() && !hasOption(SpellOption.IGNORE_COOLDOWN)) return CastResult.fail(getName() + " is on cooldown (" + CooldownManager.formatCooldown(getRemainingCooldown()) + " seconds remaining!)");
+        if (isOnCooldown() && !hasOption(SpellOption.IGNORE_COOLDOWN)) return CastResult.fail(getName() + " is on cooldown (" + CooldownManager.formatCooldown(getRemainingCooldown()) + " seconds remaining)");
 
         var costResult = evaluateCosts(context);
         if (!costResult.isSuccess() && !hasOption(SpellOption.IGNORE_COSTS)) return costResult;
@@ -116,6 +121,7 @@ public abstract class Spell implements Identifiable, Nameable, Describable, Conf
         getParent().postCast(context);
 
         if (!hasOption(SpellOption.IGNORE_COSTS)) runCosts(context);
+        if (!hasOption(SpellOption.IGNORE_COOLDOWN)) setOnCooldown(true);
 
         return CastResult.success();
     }
@@ -172,6 +178,26 @@ public abstract class Spell implements Identifiable, Nameable, Describable, Conf
 
     public boolean hasOption(SpellOption option) {
         return getDefinition().hasOption(option);
+    }
+
+    public void setType(SpellType spellType) {
+        this.spellType = spellType;
+    }
+
+    public SpellType getType() {
+        return spellType;
+    }
+
+    public boolean isToggled() {
+        return toggled;
+    }
+
+    public void setToggled(boolean toggled) {
+        if (!(getType() instanceof ToggleSpellType)) {
+            Merlin.getInstance().getLogger().warning("Tried to toggle non-toggleable spell " + getId() + " with parent " + getParent().getId());
+        }
+
+        this.toggled = toggled;
     }
 
     /* Damage Source Stuff */

@@ -1,7 +1,7 @@
 package co.runed.merlin.concept.classes;
 
 import co.runed.bolster.events.entity.EntityDestroyEvent;
-import co.runed.bolster.util.Manager;
+import co.runed.bolster.managers.Manager;
 import co.runed.bolster.util.registries.Definition;
 import co.runed.merlin.Merlin;
 import co.runed.merlin.concept.MerlinRegistries;

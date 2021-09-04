@@ -1,5 +1,6 @@
 package co.runed.merlin.concept.items;
 
+import co.runed.bolster.game.traits.Trait;
 import co.runed.bolster.util.Category;
 import co.runed.bolster.util.ItemBuilder;
 import co.runed.bolster.util.registries.Definition;
@@ -7,7 +8,7 @@ import co.runed.bolster.util.registries.Registry;
 import co.runed.merlin.concept.MerlinRegistries;
 import co.runed.merlin.concept.definitions.SpellProviderDefinition;
 import co.runed.merlin.concept.spells.SpellDefinition;
-import co.runed.merlin.concept.spells.SpellType;
+import co.runed.merlin.concept.spells.type.SpellType;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -33,23 +34,28 @@ public class ItemDefinition extends SpellProviderDefinition<ItemImpl> {
     }
 
     @Override
-    public ItemDefinition addSpell(SpellDefinition spell, SpellType spellType) {
-        return this.addSpell(spell, spellType, 0L);
+    public ItemDefinition addSpell(SpellDefinition spell) {
+        return (ItemDefinition) super.addSpell(spell);
+    }
+
+    public ItemDefinition addSpell(SpellDefinition spell, ItemRequirement requirement) {
+        return this.addSpell(spell, new SpellType(), requirement);
     }
 
     @Override
-    public ItemDefinition addSpell(SpellDefinition spell, SpellType spellType, long frequency) {
-        return this.addSpell(spell, spellType, frequency, ItemRequirement.ALWAYS);
+    public ItemDefinition addSpell(SpellDefinition spell, SpellType spellType) {
+        return this.addSpell(spell, spellType, ItemRequirement.ALWAYS);
     }
 
     public ItemDefinition addSpell(SpellDefinition spell, SpellType spellType, ItemRequirement requirement) {
-        return this.addSpell(spell, spellType, 0L, requirement);
-    }
-
-    public ItemDefinition addSpell(SpellDefinition spell, SpellType spellType, long frequency, ItemRequirement requirement) {
         itemRequirements.put(spell, requirement);
 
-        return (ItemDefinition) super.addSpell(spell, spellType, frequency);
+        return (ItemDefinition) super.addSpell(spell, spellType);
+    }
+
+    @Override
+    public <J> ItemDefinition setTrait(Trait<J> key, J value) {
+        return (ItemDefinition) super.setTrait(key, value);
     }
 
     @Override

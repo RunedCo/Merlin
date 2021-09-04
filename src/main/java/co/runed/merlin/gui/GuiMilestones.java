@@ -44,6 +44,8 @@ public class GuiMilestones extends Gui {
 
     @Override
     protected Menu draw(Player player) {
+        this.player = player;
+
         var pageTemplate = ChestMenu.builder(6)
                 .title(getTitle(player))
                 .redraw(true);
@@ -60,7 +62,6 @@ public class GuiMilestones extends Gui {
         var builder = PaginatedMenuBuilder.builder(pageTemplate)
                 .slots(milestoneMask);
 
-        player = player;
         playerData = PlayerManager.getInstance().getPlayerData(player);
 
         var milestones = item.getMilestones().values().stream().sorted((m, m2) -> m.getLevel() - m2.getLevel()).collect(Collectors.toList());

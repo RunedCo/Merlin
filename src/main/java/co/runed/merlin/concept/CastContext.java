@@ -4,10 +4,10 @@ import co.runed.merlin.concept.items.ItemDefinition;
 import co.runed.merlin.concept.items.ItemImpl;
 import co.runed.merlin.concept.spells.Spell;
 import co.runed.merlin.concept.spells.SpellProvider;
+import co.runed.merlin.concept.triggers.Params;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
 import org.jetbrains.annotations.NotNull;
 
 public class CastContext {
@@ -16,7 +16,7 @@ public class CastContext {
     private final SpellProvider provider;
     private final Spell spell;
     private boolean cancelled = false;
-    private Event event;
+    private Params params;
 
     public CastContext(LivingEntity entity, Spell spell) {
         this.caster = Caster.from(entity);
@@ -28,6 +28,14 @@ public class CastContext {
 
     public Caster getCaster() {
         return caster;
+    }
+
+    public LivingEntity getCasterEntity() {
+        return getCaster().getEntity();
+    }
+
+    public World getWorld() {
+        return castLocation.getWorld();
     }
 
     public ItemImpl getItem() {
@@ -59,23 +67,19 @@ public class CastContext {
     }
 
     public boolean isCancelled() {
-        if (event instanceof Cancellable cancellable) {
-            return cancellable.isCancelled();
-        }
+        if (params != null) return params.isCancelled();
 
         return cancelled;
     }
 
     public void setCancelled(boolean cancelled) {
-        if (event instanceof Cancellable cancellable) {
-            cancellable.setCancelled(cancelled);
-        }
+        if (params != null) params.setCancelled(cancelled);
 
         this.cancelled = true;
     }
 
-    public CastContext setEvent(Event event) {
-        this.event = event;
+    public CastContext setParams(Params params) {
+        this.params = params;
 
         return this;
     }

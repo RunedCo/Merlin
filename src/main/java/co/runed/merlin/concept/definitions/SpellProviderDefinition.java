@@ -1,5 +1,7 @@
 package co.runed.merlin.concept.definitions;
 
+import co.runed.bolster.common.properties.Properties;
+import co.runed.bolster.game.traits.Trait;
 import co.runed.bolster.managers.PlayerManager;
 import co.runed.bolster.util.ItemBuilder;
 import co.runed.bolster.util.StringUtil;
@@ -9,7 +11,7 @@ import co.runed.merlin.Merlin;
 import co.runed.merlin.concept.items.ItemImpl;
 import co.runed.merlin.concept.spells.SpellDefinition;
 import co.runed.merlin.concept.spells.SpellProvider;
-import co.runed.merlin.concept.spells.SpellType;
+import co.runed.merlin.concept.spells.type.SpellType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
@@ -28,6 +30,7 @@ public abstract class SpellProviderDefinition<T extends SpellProvider> extends D
     private final Map<Integer, ConfigurationSection> levelConfigs = new HashMap<>();
     private final Map<Integer, ConfigurationSection> unmergedLevelConfigs = new HashMap<>();
     private final Map<Integer, MilestoneData> milestones = new HashMap<>();
+    private final Properties traits = new Properties();
 
     private final Set<SpellData> spells = new HashSet<>();
 
@@ -111,12 +114,18 @@ public abstract class SpellProviderDefinition<T extends SpellProvider> extends D
         return this.milestones;
     }
 
-    public SpellProviderDefinition<T> addSpell(SpellDefinition spell, SpellType spellType) {
-        return addSpell(spell, spellType, 0);
+    public SpellProviderDefinition<T> addSpell(SpellDefinition spell) {
+        return addSpell(spell, new SpellType());
     }
 
-    public SpellProviderDefinition<T> addSpell(SpellDefinition spell, SpellType spellType, long frequency) {
-        spells.add(new SpellData(spell, spellType, frequency));
+    public SpellProviderDefinition<T> addSpell(SpellDefinition spell, SpellType spellType) {
+        spells.add(new SpellData(spell, spellType));
+
+        return this;
+    }
+
+    public <J> SpellProviderDefinition<T> setTrait(Trait<J> key, J value) {
+        this.traits.set(key, value);
 
         return this;
     }
@@ -136,11 +145,27 @@ public abstract class SpellProviderDefinition<T extends SpellProvider> extends D
     }
 
     @Override
+    public SpellProviderDefinition<T> from(Definition<T> parent) {
+        super.from(parent);
+
+        if (parent instanceof SpellProviderDefinition<T> spellDef) {
+            this.spells.addAll(spellDef.spells);
+            this.traits.addAll(spellDef.traits);
+        }
+
+        return this;
+    }
+
+    @Override
     public T create() {
         var out = super.create();
 
+        out.getTraits().addAll(traits);
+
         for (var data : spells) {
             var spell = data.definition.create();
+            spell.setType(data.spellType);
+
             out.addSpell(spell);
         }
 
@@ -195,12 +220,10 @@ public abstract class SpellProviderDefinition<T extends SpellProvider> extends D
     private static class SpellData {
         private final SpellDefinition definition;
         private final SpellType spellType;
-        private final long frequency;
 
-        public SpellData(SpellDefinition definition, SpellType type, long frequency) {
+        public SpellData(SpellDefinition definition, SpellType type) {
             this.definition = definition;
             this.spellType = type;
-            this.frequency = frequency;
         }
     }
 

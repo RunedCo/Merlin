@@ -1,4 +1,4 @@
-package co.runed.merlin.concept;
+package co.runed.merlin.concept.util;
 
 import org.jetbrains.annotations.NotNull;
 

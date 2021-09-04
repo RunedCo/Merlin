@@ -1,19 +1,27 @@
 package co.runed.merlin.concept.spells;
 
-import co.runed.bolster.util.Manager;
+import co.runed.bolster.managers.Manager;
+import co.runed.bolster.util.TimeUtil;
 import co.runed.bolster.util.registries.Definition;
 import co.runed.merlin.Merlin;
 import co.runed.merlin.concept.CastContext;
 import co.runed.merlin.concept.definitions.SpellProviderDefinition;
 import co.runed.merlin.concept.spells.runeblade.Runedash;
+import co.runed.merlin.concept.spells.type.RepeatingSpellType;
 import co.runed.merlin.concept.triggers.Trigger;
 import co.runed.merlin.concept.triggers.interact.PlayerInteractListener;
 import co.runed.merlin.concept.triggers.inventory.PlayerInventoryListener;
-import co.runed.merlin.concept.triggers.inventory.PlayerSelectListener;
+import co.runed.merlin.concept.triggers.lifecycle.OnTriggerTrigger;
+import co.runed.merlin.concept.triggers.lifecycle.TickTrigger;
+import co.runed.merlin.concept.triggers.lifecycle.TriggerParams;
+import co.runed.merlin.concept.triggers.projectile.EntityProjectileListener;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -26,7 +34,7 @@ public class SpellManager extends Manager {
             .priority(1000);
 
     private final Map<UUID, Collection<SpellProvider>> spellProviders = new HashMap<>();
-    private final Map<UUID, Collection<Spell>> spells = new HashMap<>();
+    private final Map<UUID, Collection<PassiveSpellContainer>> passives = new HashMap<>();
     private final Map<UUID, Long> lastErrorTime = new HashMap<>();
 
     private static SpellManager _instance;
@@ -36,8 +44,7 @@ public class SpellManager extends Manager {
 
         Bukkit.getPluginManager().registerEvents(new PlayerInventoryListener(), Merlin.getInstance());
         Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(), Merlin.getInstance());
-        Bukkit.getPluginManager().registerEvents(new PlayerSelectListener(), Merlin.getInstance());
-
+        Bukkit.getPluginManager().registerEvents(new EntityProjectileListener(), Merlin.getInstance());
 
         _instance = this;
     }
@@ -55,9 +62,12 @@ public class SpellManager extends Manager {
     }
 
     public void addProvider(LivingEntity entity, SpellProvider provider) {
-        spellProviders.putIfAbsent(entity.getUniqueId(), new ArrayList<>());
+        var uuid = entity.getUniqueId();
 
-        var providers = spellProviders.get(entity.getUniqueId());
+        spellProviders.putIfAbsent(uuid, new HashSet<>());
+        passives.putIfAbsent(uuid, new HashSet<>());
+
+        var providers = spellProviders.get(uuid);
 
         // TODO check if provider is solo (e.g class) and disable others of same type if true
 
@@ -71,16 +81,39 @@ public class SpellManager extends Manager {
             });
         }
 
-        providers.add(provider);
+        if (!providers.contains(provider)) {
+            providers.add(provider);
+        }
+
+        for (var spell : provider.getSpells()) {
+            if (spell.getType() instanceof RepeatingSpellType repeating && repeating.getFrequency() > 0L) {
+                passives.putIfAbsent(uuid, new HashSet<>());
+
+                var passive = new PassiveSpellContainer(spell, repeating.getFrequency());
+
+                passive.start();
+
+                passives.get(uuid).add(passive);
+            }
+        }
 
         provider.setOwner(entity);
         provider.setEnabled(true);
     }
 
     public void removeProvider(LivingEntity entity, SpellProvider provider) {
-        var providers = spellProviders.getOrDefault(entity.getUniqueId(), new ArrayList<>());
+        var providers = spellProviders.getOrDefault(entity.getUniqueId(), new HashSet<>());
 
         if (!providers.contains(provider)) return;
+
+        var entityPassives = passives.getOrDefault(entity.getUniqueId(), new HashSet<>());
+
+        for (var passive : new HashSet<>(entityPassives)) {
+            if (passive.spell.getParent() == provider) {
+                entityPassives.remove(passive);
+                passive.stop();
+            }
+        }
 
         provider.setEnabled(false);
     }
@@ -98,7 +131,8 @@ public class SpellManager extends Manager {
 
         if (!providers.contains(provider)) return;
 
-        provider.setEnabled(false);
+        removeProvider(entity, provider);
+
         provider.destroy();
 
         providers.remove(provider);
@@ -112,7 +146,11 @@ public class SpellManager extends Manager {
         var entityProviders = spellProviders.getOrDefault(entity.getUniqueId(), new HashSet<>());
 
         for (var provider : entityProviders) {
-            if (provider.getDefinition() == definition) return provider;
+            if (provider.getDefinition() == definition) {
+
+                provider.setOwner(entity);
+                return provider;
+            }
         }
 
         return null;
@@ -125,6 +163,8 @@ public class SpellManager extends Manager {
         var spellProviders = this.spellProviders.getOrDefault(entity.getUniqueId(), new HashSet<>());
 
         for (var provider : spellProviders) {
+            provider.setOwner(entity);
+
             spells.addAll(provider.getSpells());
         }
 
@@ -154,14 +194,19 @@ public class SpellManager extends Manager {
         for (var spell : spells) {
             if (castContext != null && castContext.isCancelled() && !spell.hasOption(SpellOption.IGNORE_CANCELLED)) continue;
 
-            castContext = run(entity, spell, func);
+            castContext = run(spell, trigger, func);
         }
     }
 
-    public <T extends Trigger> CastContext run(LivingEntity entity, Spell spell, BiFunction<T, CastContext, CastResult> func) {
+    public <T extends Trigger> CastContext run(Spell spell, Class<T> trigger, BiFunction<T, CastContext, CastResult> func) {
+        if (spell == null) return null;
+
+        var entity = spell.getOwner();
         var castContext = new CastContext(entity, spell);
 
         try {
+            if (trigger != OnTriggerTrigger.class) run(entity, OnTriggerTrigger.class, (spl, context) -> spl.onTrigger(context, new TriggerParams(trigger, castContext)));
+
             var result = spell.preCast(castContext);
 
             if (result.isSuccess()) {
@@ -177,15 +222,23 @@ public class SpellManager extends Manager {
 
                     this.lastErrorTime.put(entity.getUniqueId(), System.currentTimeMillis());
                 }
+
+                return castContext;
             }
 
             if (result.isSuccess()) {
                 result = spell.postCast(castContext);
+
+                if (spell.hasOption(SpellOption.ALERT_WHEN_READY)) {
+                    var testTask = Bukkit.getScheduler().runTaskLater(Merlin.getInstance(), () -> {
+                        entity.sendMessage(ChatColor.GREEN + spell.getName() + " is ready!");
+                        entity.playSound(Sound.sound(Key.key("block.note_block.pling"), Sound.Source.PLAYER, 1, 1.5F));
+                    }, TimeUtil.toTicks(TimeUtil.fromSeconds(spell.getRemainingCooldown())));
+                }
             }
         }
         catch (Exception e) {
             e.printStackTrace();
-
         }
 
         return castContext;
@@ -193,5 +246,30 @@ public class SpellManager extends Manager {
 
     public static SpellManager getInstance() {
         return _instance;
+    }
+
+    private static class PassiveSpellContainer {
+        BukkitTask task;
+        Spell spell;
+        long frequency;
+
+        public PassiveSpellContainer(Spell spell, long frequency) {
+            this.spell = spell;
+            this.frequency = frequency;
+        }
+
+        public void start() {
+            task = Bukkit.getScheduler().runTaskTimer(Merlin.getInstance(), this::run, 0L, frequency);
+        }
+
+        public void stop() {
+            if (task == null) return;
+
+            task.cancel();
+        }
+
+        public void run() {
+            SpellManager.getInstance().run(spell, TickTrigger.class, TickTrigger::onTick);
+        }
     }
 }

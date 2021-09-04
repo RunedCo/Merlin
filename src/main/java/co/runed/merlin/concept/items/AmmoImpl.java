@@ -20,7 +20,7 @@ public class AmmoImpl extends ItemImpl {
     public void setDisplayEnabled(boolean displayEnabled) {
         this.displayEnabled = displayEnabled;
 
-        this.rebuild();
+        rebuild();
     }
 
     public void setAmmoSlot(int slot) {
@@ -36,18 +36,18 @@ public class AmmoImpl extends ItemImpl {
     }
 
     public void addAmmo(int amount) {
-        this.ammoCount += amount;
-        this.ammoCount = Math.min(this.ammoCount, getMaxAmmo());
+        ammoCount += amount;
+        ammoCount = Math.max(0, Math.min(ammoCount, getMaxAmmo()));
 
         if (getOwner() == null) return;
 
         var inventory = BolsterEntity.from(getOwner()).getPlayerInventory();
 
-        if (inventory.getItem(getAmmoSlot()) == null) inventory.setItem(getAmmoSlot(), toItemStack());
+        rebuild();
 
-        this.rebuild();
-
-        inventory.getItem(getAmmoSlot()).setAmount(Math.max(1, this.ammoCount));
+        for (var stack : ItemManager.getInstance().getAllItemStacks(inventory, getDefinition())) {
+            stack.setAmount(Math.max(1, ammoCount));
+        }
     }
 
     public int getCurrentAmmo() {

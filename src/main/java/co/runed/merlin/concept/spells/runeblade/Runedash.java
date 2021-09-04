@@ -2,17 +2,20 @@ package co.runed.merlin.concept.spells.runeblade;
 
 import co.runed.bolster.damage.DamageInfo;
 import co.runed.bolster.damage.DamageType;
-import co.runed.merlin.concept.AOE;
 import co.runed.merlin.concept.CastContext;
-import co.runed.merlin.concept.RepeatingTask;
 import co.runed.merlin.concept.spells.CastResult;
 import co.runed.merlin.concept.spells.Spell;
 import co.runed.merlin.concept.spells.SpellDefinition;
 import co.runed.merlin.concept.triggers.interact.InteractParams;
-import co.runed.merlin.concept.triggers.interact.InteractTrigger;
+import co.runed.merlin.concept.triggers.interact.RightClickTrigger;
+import co.runed.merlin.concept.util.AOE;
+import co.runed.merlin.concept.util.Leap;
+import co.runed.merlin.concept.util.task.RepeatingTask;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 
-public class Runedash extends Spell implements InteractTrigger {
+public class Runedash extends Spell implements RightClickTrigger {
     private final double upwardsVelocity = 0.5;
     private final double forwardsVelocity = 5;
     private final double damage = 20;
@@ -29,14 +32,19 @@ public class Runedash extends Spell implements InteractTrigger {
     }
 
     @Override
-    public CastResult onClick(CastContext context, InteractParams params) {
+    public CastResult onRightClick(CastContext context, InteractParams params) {
         if (!params.isRightClick()) return CastResult.fail();
+        var entity = context.getCaster().getEntity();
 
         var task = new RepeatingTask(2L)
-                .repeats(20)
+                .until(() -> false)
                 .run(() -> doTick(context, params));
 
-        context.getCaster().getEntity().sendMessage("Click!");
+        var leap = new Leap(upwardsVelocity, forwardsVelocity)
+                .onLand(task::cancel)
+                .apply(entity);
+
+        entity.getWorld().playSound(Sound.sound(Key.key("dvz:runeblade_runedash"), Sound.Source.PLAYER, 1, 1));
 
         return CastResult.success();
     }
@@ -49,12 +57,15 @@ public class Runedash extends Spell implements InteractTrigger {
         var targets = AOE.livingEntities(context.getCaster().getLocation(), 5)
                 .ignoreIf((target) -> context.getCaster().equals(target));
 
+        var damage = new DamageInfo(100)
+                .withType(DamageType.PRIMARY)
+                .withAttacker(context.getCaster().getEntity())
+                .withSource(this);
+
         for (var target : targets) {
-            var damage = new DamageInfo(100)
-                    .withType(DamageType.PRIMARY)
-                    .withAttacker(context.getCaster().getEntity())
-                    .withSource(this)
-                    .apply(target);
+            damage.apply(target);
+
+            context.getCaster().getEntity().sendMessage("Hit " + target.getName());
         }
 
 //        var aoe = new EntityAOE(context.getCaster().getLocation(), 5)
