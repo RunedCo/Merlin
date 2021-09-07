@@ -1,7 +1,9 @@
-package co.runed.merlin.concept.items;
+package co.runed.merlin.concept.items.ammo;
 
 import co.runed.bolster.entity.BolsterEntity;
 import co.runed.bolster.util.ItemBuilder;
+import co.runed.merlin.concept.items.ItemImpl;
+import co.runed.merlin.concept.items.ItemManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;

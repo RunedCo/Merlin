@@ -4,12 +4,15 @@ import co.runed.bolster.game.traits.Traits;
 import co.runed.bolster.util.Category;
 import co.runed.bolster.util.ItemBuilder;
 import co.runed.merlin.concept.costs.AmmoCost;
+import co.runed.merlin.concept.items.ammo.AmmoDefinition;
 import co.runed.merlin.concept.spells.AmmoShootSpell;
 import co.runed.merlin.concept.spells.SpellDefinition;
-import co.runed.merlin.concept.spells.SpellManager;
+import co.runed.merlin.concept.spells.SpellOption;
 import co.runed.merlin.concept.spells.TickTest;
-import co.runed.merlin.concept.spells.longbow.TNTBowShoot;
-import co.runed.merlin.concept.spells.wand.WandBlast;
+import co.runed.merlin.concept.spells.dvz.longbow.TNTBowShoot;
+import co.runed.merlin.concept.spells.dvz.rocketboots.RocketJump;
+import co.runed.merlin.concept.spells.dvz.runeblade.Runedash;
+import co.runed.merlin.concept.spells.dvz.wand.WandBlast;
 import org.bukkit.Material;
 
 public class Items {
@@ -42,9 +45,15 @@ public class Items {
 
     /* DVZ Items */
     // Runeblade
+    public static final SpellDefinition RUNEDASH = new SpellDefinition("runedash", Runedash::new)
+            .setName("Runedash")
+            .options(SpellOption.ALERT_WHEN_READY)
+            .cooldown(10)
+            .priority(1000);
+
     public static ItemDefinition RUNEBLADE = new ItemDefinition("runeblade")
             .from(WEAPON_BASE)
-            .addSpell(SpellManager.RUNEDASH, ItemRequirement.ANY_HAND)
+            .addSpell(RUNEDASH, ItemRequirement.ANY_HAND)
             .setTrait(Traits.MAX_HEALTH, 20d)
             .register();
 
@@ -84,5 +93,15 @@ public class Items {
             .setName("Magic Wand")
             .setBaseItemStack(new ItemBuilder(Material.STICK))
             .addSpell(WAND_BLAST, ItemRequirement.MAIN_HAND)
+            .register();
+
+    // BOOTS TEST
+    public static SpellDefinition ROCKET_JUMP = new SpellDefinition("rocket_jump", RocketJump::new)
+            .cooldown(20);
+
+    public static ItemDefinition ROCKET_BOOTS = new ItemDefinition("rocket_boots")
+            .setName("Rocket Boots")
+            .setBaseItemStack(new ItemBuilder(Material.DIAMOND_BOOTS))
+            .addSpell(ROCKET_JUMP, ItemRequirement.ARMOR)
             .register();
 }

@@ -7,6 +7,7 @@ import co.runed.bolster.util.registries.Definition;
 import co.runed.bolster.util.registries.Registry;
 import co.runed.merlin.concept.MerlinRegistries;
 import co.runed.merlin.concept.definitions.SpellProviderDefinition;
+import co.runed.merlin.concept.items.ammo.AmmoDefinition;
 import co.runed.merlin.concept.spells.SpellDefinition;
 import co.runed.merlin.concept.spells.type.SpellType;
 import org.bukkit.Material;

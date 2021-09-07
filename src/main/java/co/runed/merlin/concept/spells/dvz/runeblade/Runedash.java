@@ -1,4 +1,4 @@
-package co.runed.merlin.concept.spells.runeblade;
+package co.runed.merlin.concept.spells.dvz.runeblade;
 
 import co.runed.bolster.damage.DamageInfo;
 import co.runed.bolster.damage.DamageType;

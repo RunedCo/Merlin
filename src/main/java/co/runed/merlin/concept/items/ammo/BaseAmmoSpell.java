@@ -1,7 +1,6 @@
 package co.runed.merlin.concept.items.ammo;
 
 import co.runed.merlin.concept.CastContext;
-import co.runed.merlin.concept.items.AmmoImpl;
 import co.runed.merlin.concept.items.ItemDefinition;
 import co.runed.merlin.concept.items.ItemManager;
 import co.runed.merlin.concept.spells.CastResult;

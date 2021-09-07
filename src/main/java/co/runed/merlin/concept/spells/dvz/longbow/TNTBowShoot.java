@@ -1,8 +1,8 @@
-package co.runed.merlin.concept.spells.longbow;
+package co.runed.merlin.concept.spells.dvz.longbow;
 
 import co.runed.merlin.concept.CastContext;
-import co.runed.merlin.concept.items.AmmoImpl;
 import co.runed.merlin.concept.items.ItemDefinition;
+import co.runed.merlin.concept.items.ammo.AmmoImpl;
 import co.runed.merlin.concept.spells.CastResult;
 import co.runed.merlin.concept.spells.Spell;
 import co.runed.merlin.concept.spells.SpellDefinition;
@@ -20,7 +20,6 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.EulerAngle;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -56,10 +55,12 @@ public class TNTBowShoot extends Spell implements OnShootTrigger, LeftClickTrigg
                     entity.addPassenger(armorStand);
                 })
                 .onTick(proj -> {
-                    var entity = proj.getEntity();
-                    var loc = entity.getLocation();
-                    var armorStand = (ArmorStand) entity.getPassengers().get(0);
-                    armorStand.setHeadPose(new EulerAngle(Math.toRadians(-loc.getPitch()), Math.toRadians(-loc.getYaw()), 0));
+//                    var entity = proj.getEntity();
+//                    var loc = entity.getLocation();
+//                    var armorStand = (ArmorStand) entity.getPassengers().get(0);
+//                    var oldPose = armorStand.getHeadPose();
+//
+//                    armorStand.setHeadPose(new EulerAngle(Math.toRadians(loc.getPitch()), Math.toRadians(-loc.getYaw()), oldPose.getZ()));
                 })
                 .onHit((proj, target) -> target.damage(1))
                 .onFinish(proj -> {

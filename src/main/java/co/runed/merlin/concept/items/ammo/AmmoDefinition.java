@@ -1,7 +1,9 @@
-package co.runed.merlin.concept.items;
+package co.runed.merlin.concept.items.ammo;
 
 import co.runed.bolster.util.registries.Definition;
-import co.runed.merlin.concept.items.ammo.BaseAmmoSpell;
+import co.runed.merlin.concept.items.ItemDefinition;
+import co.runed.merlin.concept.items.ItemImpl;
+import co.runed.merlin.concept.items.ItemRequirement;
 import co.runed.merlin.concept.spells.SpellDefinition;
 import co.runed.merlin.concept.spells.SpellOption;
 
@@ -20,7 +22,7 @@ public class AmmoDefinition extends ItemDefinition {
 
         this.addSpell(BASE_AMMO_SPELL, ItemRequirement.ALWAYS);
     }
-    
+
     @Override
     public AmmoDefinition setName(String name) {
         return (AmmoDefinition) super.setName(name);

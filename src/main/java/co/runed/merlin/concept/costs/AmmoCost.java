@@ -1,9 +1,9 @@
 package co.runed.merlin.concept.costs;
 
 import co.runed.merlin.concept.CastContext;
-import co.runed.merlin.concept.items.AmmoDefinition;
-import co.runed.merlin.concept.items.AmmoImpl;
 import co.runed.merlin.concept.items.ItemManager;
+import co.runed.merlin.concept.items.ammo.AmmoDefinition;
+import co.runed.merlin.concept.items.ammo.AmmoImpl;
 import co.runed.merlin.concept.spells.CastResult;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
