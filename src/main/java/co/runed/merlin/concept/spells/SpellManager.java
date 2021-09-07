@@ -6,7 +6,6 @@ import co.runed.bolster.util.registries.Definition;
 import co.runed.merlin.Merlin;
 import co.runed.merlin.concept.CastContext;
 import co.runed.merlin.concept.definitions.SpellProviderDefinition;
-import co.runed.merlin.concept.spells.runeblade.Runedash;
 import co.runed.merlin.concept.spells.type.RepeatingSpellType;
 import co.runed.merlin.concept.triggers.Trigger;
 import co.runed.merlin.concept.triggers.interact.PlayerInteractListener;
@@ -14,7 +13,9 @@ import co.runed.merlin.concept.triggers.inventory.PlayerInventoryListener;
 import co.runed.merlin.concept.triggers.lifecycle.OnTriggerTrigger;
 import co.runed.merlin.concept.triggers.lifecycle.TickTrigger;
 import co.runed.merlin.concept.triggers.lifecycle.TriggerParams;
+import co.runed.merlin.concept.triggers.movement.EntityMovementListener;
 import co.runed.merlin.concept.triggers.projectile.EntityProjectileListener;
+import co.runed.merlin.concept.util.task.Task;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Bukkit;
@@ -27,11 +28,7 @@ import java.util.*;
 import java.util.function.BiFunction;
 
 public class SpellManager extends Manager {
-    public static final SpellDefinition RUNEDASH = new SpellDefinition("runedash", Runedash::new)
-            .setName("Runedash")
-            .options(SpellOption.ALERT_WHEN_READY)
-            .cooldown(10)
-            .priority(1000);
+    public static final Sound ALERT_READY_SOUND = Sound.sound(Key.key("block.note_block.pling"), Sound.Source.PLAYER, 1, 1.5F);
 
     private final Map<UUID, Collection<SpellProvider>> spellProviders = new HashMap<>();
     private final Map<UUID, Collection<PassiveSpellContainer>> passives = new HashMap<>();
@@ -45,6 +42,7 @@ public class SpellManager extends Manager {
         Bukkit.getPluginManager().registerEvents(new PlayerInventoryListener(), Merlin.getInstance());
         Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(), Merlin.getInstance());
         Bukkit.getPluginManager().registerEvents(new EntityProjectileListener(), Merlin.getInstance());
+        Bukkit.getPluginManager().registerEvents(new EntityMovementListener(), Merlin.getInstance());
 
         _instance = this;
     }
@@ -230,10 +228,12 @@ public class SpellManager extends Manager {
                 result = spell.postCast(castContext);
 
                 if (spell.hasOption(SpellOption.ALERT_WHEN_READY)) {
-                    var testTask = Bukkit.getScheduler().runTaskLater(Merlin.getInstance(), () -> {
-                        entity.sendMessage(ChatColor.GREEN + spell.getName() + " is ready!");
-                        entity.playSound(Sound.sound(Key.key("block.note_block.pling"), Sound.Source.PLAYER, 1, 1.5F));
-                    }, TimeUtil.toTicks(TimeUtil.fromSeconds(spell.getRemainingCooldown())));
+                    var alertTask = new Task()
+                            .delay(TimeUtil.toTicks(TimeUtil.fromSeconds(spell.getRemainingCooldown())))
+                            .run(() -> {
+                                entity.sendMessage(ChatColor.GREEN + spell.getName() + " is ready!");
+                                entity.playSound(ALERT_READY_SOUND);
+                            });
                 }
             }
         }

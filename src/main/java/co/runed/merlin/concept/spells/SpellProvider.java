@@ -1,9 +1,5 @@
 package co.runed.merlin.concept.spells;
 
-import co.runed.dayroom.util.Describable;
-import co.runed.dayroom.util.Enableable;
-import co.runed.dayroom.util.Identifiable;
-import co.runed.dayroom.util.Nameable;
 import co.runed.bolster.damage.DamageSource;
 import co.runed.bolster.entity.BolsterEntity;
 import co.runed.bolster.game.traits.TraitProvider;
@@ -13,6 +9,10 @@ import co.runed.bolster.util.IconPreview;
 import co.runed.bolster.util.Owned;
 import co.runed.bolster.util.config.ConfigUtil;
 import co.runed.bolster.util.config.Configurable;
+import co.runed.dayroom.util.Describable;
+import co.runed.dayroom.util.Enableable;
+import co.runed.dayroom.util.Identifiable;
+import co.runed.dayroom.util.Nameable;
 import co.runed.merlin.concept.CastContext;
 import co.runed.merlin.concept.definitions.SpellProviderDefinition;
 import co.runed.merlin.core.SpellProviderType;
@@ -51,21 +51,21 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
 
     @Override
     public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+        System.out.println("Provider " + getId() + " enabled=" + enabled + " owner=" + getOwner());
 
-        if (this.isEnabled() != enabled && this.getOwner() != null) {
-
+        if (isEnabled() != enabled && getOwner() != null) {
             // On Disable
             if (!enabled) {
-                this.onDisable();
+                onDisable();
             }
 
             // On Enable
             if (enabled) {
-                this.onEnable();
-
+                onEnable();
             }
         }
+
+        this.enabled = enabled;
     }
 
     public void onEnable() {
@@ -79,6 +79,8 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
             maxHealthModifier = new AttributeModifier(UUID.randomUUID(), getId() + "_max_health", getTrait(Traits.MAX_HEALTH), AttributeModifier.Operation.ADD_NUMBER);
 
             attribute.addModifier(maxHealthModifier);
+            
+            getOwner().setHealth(attribute.getValue());
         }
     }
 
@@ -119,7 +121,7 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
 
         description = config.getString("description", description);
         name = config.getString("name", name);
-        setTrait(Traits.MAX_HEALTH, config.getDouble(CONFIG_KEY_HEALTH, 0));
+        setTrait(Traits.MAX_HEALTH, config.getDouble(CONFIG_KEY_HEALTH, getTrait(Traits.MAX_HEALTH)));
 
         for (var spell : spells) {
             if (config.isConfigurationSection(spell.getId())) {

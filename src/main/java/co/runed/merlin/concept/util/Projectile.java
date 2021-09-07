@@ -3,7 +3,9 @@ package co.runed.merlin.concept.util;
 import co.runed.bolster.damage.DamageInfo;
 import co.runed.bolster.fx.particles.ParticleSet;
 import co.runed.bolster.fx.particles.ParticleType;
+import co.runed.bolster.fx.particles.effects.LineParticleEffect;
 import co.runed.bolster.game.Team;
+import co.runed.bolster.managers.EntityManager;
 import co.runed.bolster.v1_16_R3.CraftUtil;
 import co.runed.merlin.Merlin;
 import co.runed.merlin.concept.util.task.RepeatingTask;
@@ -12,7 +14,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
@@ -50,15 +55,8 @@ public class Projectile implements Listener {
     private int numHits = 0;
     private DamageInfo damage = null;
 
+    private HitMode hitMode = HitMode.ALL;
     private Collection<UUID> ignoredEntities = new ArrayList<>();
-
-    private Task tickTask;
-
-    private boolean launched = false;
-    private Location startPos;
-    private Location previousPos;
-    private Location currentPos;
-    private Vector currentDir;
 
     private Collection<Consumer<Projectile>> onStart = new ArrayList<>();
     private Collection<Consumer<Projectile>> onTick = new ArrayList<>();
@@ -66,6 +64,15 @@ public class Projectile implements Listener {
     private Collection<BiConsumer<Projectile, LivingEntity>> onHit = new ArrayList<>();
     private Collection<Consumer<Projectile>> onFinish = new ArrayList<>();
     private boolean removeOnFinish = true;
+
+    // run instance vars
+    private Task tickTask;
+    private boolean launched = false;
+    private Location startPos;
+    private Location previousPos;
+    private Location currentPos;
+    private Vector currentDir;
+    private Block hitBlock;
 
     public Projectile() {
         this(EntityType.SNOWBALL);
@@ -125,7 +132,7 @@ public class Projectile implements Listener {
 
         direction(velocity.clone().divide(new Vector(speed, speed, speed)).normalize());
 
-        System.out.println("spd: " + speed + " vel: " + velocity + " dir: " + direction);
+//        System.out.println("spd: " + speed + " vel: " + velocity + " dir: " + direction);
 
         if (this.speed <= 1) {
             this.speed = speed;
@@ -154,6 +161,12 @@ public class Projectile implements Listener {
     }
 
     // Ignore collision with specific entities
+    public Projectile hitMode(HitMode hitMode) {
+        this.hitMode = hitMode;
+
+        return this;
+    }
+
     public Projectile ignore(Team team) {
         return this.ignore(team.getMembers());
     }
@@ -246,9 +259,6 @@ public class Projectile implements Listener {
         if (launched) return this;
         launched = true;
 
-        startPos = new Location(world, location.getX(), location.getY(), location.getZ());
-        previousPos = startPos;
-
         // Set projectile location + direction
 
 //        var velocity = this.velocity.clone();
@@ -275,6 +285,11 @@ public class Projectile implements Listener {
 
         // Set projectile velocity
         if (!velocitySet) entity.setVelocity(velocity);
+
+        startPos = entity.getLocation().clone();
+        previousPos = startPos.clone();
+        currentPos = previousPos.clone();
+        currentDir = direction.clone();
 
         if (owner != null && entity instanceof org.bukkit.entity.Projectile proj) {
             proj.setShooter(owner);
@@ -313,6 +328,7 @@ public class Projectile implements Listener {
         // Start ticking function (for particles or whatever proj needs)
         tickTask = new RepeatingTask(1L)
                 .duration(duration)
+                .delay(1L)
                 .run(this::doTick);
 
         return this;
@@ -321,21 +337,23 @@ public class Projectile implements Listener {
     private void doTick() {
         if (!launched) return;
 
-        previousPos = currentPos;
+        previousPos = currentPos.clone();
 
-        var bb = entity.getBoundingBox().getCenter();
-        currentPos = new Location(world, bb.getX(), bb.getY(), bb.getZ());
+        currentPos = entity.getBoundingBox().getCenter().toLocation(world);
 
-        if (previousPos != null) currentDir = currentPos.toVector().subtract(previousPos.toVector()).normalize();
+//        owner.sendMessage("prev: " + previousPos.toVector() + " curr: " + currentPos.toVector());
+
+        if (currentPos.distanceSquared(previousPos) > 0.5) currentDir = currentPos.toVector().subtract(previousPos.toVector()).normalize();
+
+//        owner.sendMessage(ChatColor.AQUA + "dir: " + currentDir + " dis: " + currentPos.distanceSquared(previousPos));
+
+        doParticles();
 
         onTick.forEach(func -> func.accept(this));
 
-        doParticles();
-        Block hitBlock = null;
-
-        if (entity instanceof Arrow arrow && arrow.isInBlock()) {
-            hitBlock = arrow.getAttachedBlock();
-        }
+//        if (entity instanceof Arrow arrow && arrow.isInBlock()) {
+//            hitBlock = arrow.getAttachedBlock();
+//        }
 
         if (entity.isDead() || !entity.isDead() && entity.isOnGround() || hitBlock != null) {
 
@@ -354,8 +372,7 @@ public class Projectile implements Listener {
         var hRadius = hitBoxHeight / 2;
 
         var canHit = entity.getNearbyEntities(wRadius, hRadius, wRadius);
-        canHit.removeIf(e -> ignoredEntities.contains(e.getUniqueId()));
-        canHit.removeIf(e -> entity.getPassengers().contains(e));
+        canHit.removeIf(e -> !canHit(e));
 
         if (canHit.size() <= 0) {
             return;
@@ -373,14 +390,15 @@ public class Projectile implements Listener {
         if (particles == null || currentDir == null) return;
 
         var particleInfo = ParticleSet.getActive(owner).get(particles);
+        var effect = new LineParticleEffect(currentPos, previousPos, (int) ((speed + 1) * 2));
 
-//        particleInfo.spawnParticle(world, currentPos.clone(), 2, 0, 0, 0);
+        effect.run(world, particleInfo);
 
-
-        for (var i = 0; i < 10; i++) {
-            particleInfo.spawnParticle(world, currentPos.clone().subtract(currentDir.clone().multiply(i / 3d)), 1, 0, 0, 0);
-//            world.spawnParticle(Particle.REDSTONE, currentPos.clone().subtract(dir.clone().multiply(i / 3d)), 2, new Particle.DustOptions(Color.PURPLE, 1));
-        }
+//        var steps = ((speed + 1) * 2);
+//
+//        for (var i = 0; i < steps; i++) {
+//            particleInfo.spawnParticle(world, previousPos.clone().add(currentDir.clone().multiply(i / 3d)), 1, 0, 0, 0, 1);
+//        }
     }
 
     private void doHit(LivingEntity target) {
@@ -435,9 +453,9 @@ public class Projectile implements Listener {
 
         if (event.getHitBlock() != null) {
             // DO BLOCK HIT
-            doBlockHit(event.getHitBlock());
+//            doBlockHit(event.getHitBlock());
 
-            destroy();
+            hitBlock = event.getHitBlock();
         }
 
         if (event.isCancelled()) return;
@@ -451,6 +469,20 @@ public class Projectile implements Listener {
                 event.setCancelled(true);
             }
         }
+    }
+
+    private boolean canHit(Entity e) {
+        if (ignoredEntities.contains(e.getUniqueId())) return false;
+        if (entity.getPassengers().contains(e)) return false;
+        // NOTE: metadata might be a better solution here, but this should work for pretty much all armor stands at least
+        if (!e.hasGravity()) return false;
+
+        var isAllied = EntityManager.getInstance().areEntitiesAllied(owner, entity);
+
+        if (owner != null && hitMode == HitMode.ONLY_ALLIES && !isAllied) return false;
+        if (owner != null && hitMode == HitMode.ONLY_NON_ALLIES && isAllied) return false;
+
+        return true;
     }
 
     public void destroy() {
@@ -474,5 +506,11 @@ public class Projectile implements Listener {
 
             entity.remove();
         }
+    }
+
+    public enum HitMode {
+        ALL,
+        ONLY_ALLIES,
+        ONLY_NON_ALLIES
     }
 }

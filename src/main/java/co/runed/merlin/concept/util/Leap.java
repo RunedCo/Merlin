@@ -61,7 +61,7 @@ public class Leap implements Listener {
 
         entity.setVelocity(velocity);
 
-        if (!(entity instanceof Player)) {
+        if (!(entity instanceof Player) && checkTask == null) {
             checkTask = new RepeatingTask(5L)
                     .delay(10L)
                     .run(() -> {
