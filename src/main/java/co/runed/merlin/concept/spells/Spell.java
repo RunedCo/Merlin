@@ -1,15 +1,18 @@
 package co.runed.merlin.concept.spells;
 
-import co.runed.dayroom.util.Describable;
-import co.runed.dayroom.util.Enableable;
-import co.runed.dayroom.util.Identifiable;
-import co.runed.dayroom.util.Nameable;
 import co.runed.bolster.damage.DamageInfo;
 import co.runed.bolster.damage.DamageSource;
 import co.runed.bolster.managers.CooldownManager;
 import co.runed.bolster.util.Owned;
+import co.runed.bolster.util.config.ConfigUtil;
 import co.runed.bolster.util.config.Configurable;
 import co.runed.bolster.util.cooldown.CooldownSource;
+import co.runed.bolster.util.lang.Lang;
+import co.runed.bolster.util.lang.LangProvider;
+import co.runed.dayroom.util.Describable;
+import co.runed.dayroom.util.Enableable;
+import co.runed.dayroom.util.Identifiable;
+import co.runed.dayroom.util.Nameable;
 import co.runed.merlin.Merlin;
 import co.runed.merlin.concept.CastContext;
 import co.runed.merlin.concept.costs.Cost;
@@ -21,9 +24,11 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public abstract class Spell implements Identifiable, Nameable, Describable, Configurable, Owned, DamageSource, Enableable, CooldownSource<Spell> {
+public abstract class Spell implements Identifiable, Nameable, Describable, Configurable, Owned, DamageSource, Enableable, CooldownSource<Spell>, LangProvider {
     private final SpellDefinition definition;
 
     private boolean enabled = true;
@@ -84,7 +89,7 @@ public abstract class Spell implements Identifiable, Nameable, Describable, Conf
         var parentResult = getParent().preCast(context);
         if (!parentResult.isSuccess()) return parentResult;
 
-        if (isOnCooldown() && !hasOption(SpellOption.IGNORE_COOLDOWN)) return CastResult.fail(getName() + " is on cooldown (" + CooldownManager.formatCooldown(getRemainingCooldown()) + " seconds remaining)");
+        if (isOnCooldown() && !hasOption(SpellOption.IGNORE_COOLDOWN)) return CastResult.fail(Lang.key("spell." + getId() + ".msg.cooldown", "spell.msg.cooldown").with(this).toString());
 
         var costResult = evaluateCosts(context);
         if (!costResult.isSuccess() && !hasOption(SpellOption.IGNORE_COSTS)) return costResult;
@@ -209,6 +214,21 @@ public abstract class Spell implements Identifiable, Nameable, Describable, Conf
     @Override
     public DamageSource next() {
         return getParent();
+    }
+
+    /* Language Provider */
+    @Override
+    public Map<String, String> getLangKeys() {
+        var map = new HashMap<String, String>();
+
+        map.putAll(ConfigUtil.toStringMap(getConfig(), true));
+
+        map.put("spell", getName());
+        map.put("caster", owner.getName());
+        map.put("player", owner.getName());
+        map.put("cooldown-r", CooldownManager.formatCooldown(getRemainingCooldown()));
+
+        return map;
     }
 
     /* Cooldowns */

@@ -2,6 +2,7 @@ package co.runed.merlin.concept.spells;
 
 import co.runed.bolster.managers.Manager;
 import co.runed.bolster.util.TimeUtil;
+import co.runed.bolster.util.lang.Lang;
 import co.runed.bolster.util.registries.Definition;
 import co.runed.merlin.Merlin;
 import co.runed.merlin.concept.CastContext;
@@ -231,7 +232,7 @@ public class SpellManager extends Manager {
                     var alertTask = new Task()
                             .delay(TimeUtil.toTicks(TimeUtil.fromSeconds(spell.getRemainingCooldown())))
                             .run(() -> {
-                                entity.sendMessage(ChatColor.GREEN + spell.getName() + " is ready!");
+                                entity.sendMessage(Lang.key("spell." + spell.getId() + ".msg.ready", "spell.msg.ready").with(spell).toComponent());
                                 entity.playSound(ALERT_READY_SOUND);
                             });
                 }

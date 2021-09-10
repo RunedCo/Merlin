@@ -1,0 +1,12 @@
+spell:
+  msg:
+    cooldown: "<red>%spell% is on cooldown (%cooldown-r% seconds remaining)</red>"
+    ready: "<green>%spell% is ready!</green>"
+  runedash:
+    msg.ready: "<red>IT IS TIME MORTAL.</red>"
+
+items:
+  runeblade:
+    name: "<aqua>Runeblade</aqua>"
+    tooltip: "R-Click: Dash!"
+    tooltip.advanced: "Runeblade advanced"

@@ -14,6 +14,10 @@ import co.runed.merlin.concept.util.task.RepeatingTask;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.LivingEntity;
+
+import java.util.Collection;
+import java.util.HashSet;
 
 public class Runedash extends Spell implements RightClickTrigger {
     private final double upwardsVelocity = 0.5;
@@ -21,6 +25,7 @@ public class Runedash extends Spell implements RightClickTrigger {
     private final double damage = 20;
     private final double damageRadius = 2;
     private final double cooldownReduction = 0;
+    private final Collection<LivingEntity> hitEntities = new HashSet<>();
 
     public Runedash(SpellDefinition definition) {
         super(definition);
@@ -38,7 +43,8 @@ public class Runedash extends Spell implements RightClickTrigger {
 
         var task = new RepeatingTask(2L)
                 .until(() -> false)
-                .run(() -> doTick(context, params));
+                .run(() -> doTick(context, params))
+                .onFinish(hitEntities::clear);
 
         var leap = new Leap(upwardsVelocity, forwardsVelocity)
                 .onLand(task::cancel)
@@ -55,7 +61,8 @@ public class Runedash extends Spell implements RightClickTrigger {
 
     private void doTick(CastContext context, InteractParams params) {
         var targets = AOE.livingEntities(context.getCaster().getLocation(), 5)
-                .ignoreIf((target) -> context.getCaster().equals(target));
+                .ignoreIf((target) -> context.getCaster().equals(target))
+                .ignoreIf(() -> hitEntities);
 
         var damage = new DamageInfo(100)
                 .withType(DamageType.PRIMARY)
@@ -64,6 +71,8 @@ public class Runedash extends Spell implements RightClickTrigger {
 
         for (var target : targets) {
             damage.apply(target);
+
+            hitEntities.add(target);
 
             context.getCaster().getEntity().sendMessage("Hit " + target.getName());
         }
