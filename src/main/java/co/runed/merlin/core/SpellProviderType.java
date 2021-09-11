@@ -1,6 +1,8 @@
 package co.runed.merlin.core;
 
-public class SpellProviderType {
+import co.runed.dayroom.util.Identifiable;
+
+public class SpellProviderType implements Identifiable {
     public static final SpellProviderType CLASS = new SpellProviderType("class", true);
     public static final SpellProviderType ITEM = new SpellProviderType("item", false);
     public static final SpellProviderType UPGRADE = new SpellProviderType("upgrade", false);
@@ -15,5 +17,10 @@ public class SpellProviderType {
 
     public boolean isSolo() {
         return solo;
+    }
+
+    @Override
+    public String getId() {
+        return id;
     }
 }

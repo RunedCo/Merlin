@@ -44,6 +44,7 @@ public abstract class Spell implements Identifiable, Nameable, Describable, Conf
     private LivingEntity owner;
     private SpellProvider parent;
     private List<Cost> instanceCosts = new ArrayList<>();
+    private ConfigurationSection config = ConfigUtil.create();
 
     public Spell(@NotNull SpellDefinition definition) {
         this.definition = definition;
@@ -132,13 +133,6 @@ public abstract class Spell implements Identifiable, Nameable, Describable, Conf
     }
 
     @Override
-    public void loadConfig(ConfigurationSection config) {
-        enabled = config.getBoolean("enabled", enabled);
-        cooldown = config.getDouble("cooldown", cooldown);
-        cooldownId = config.getString("shared-cooldown-id", cooldownId);
-    }
-
-    @Override
     public String getDescription() {
         return getDefinition().getDescription();
     }
@@ -218,7 +212,7 @@ public abstract class Spell implements Identifiable, Nameable, Describable, Conf
 
     /* Language Provider */
     @Override
-    public Map<String, String> getLangKeys() {
+    public Map<String, String> getLangReplacements() {
         var map = new HashMap<String, String>();
 
         map.putAll(ConfigUtil.toStringMap(getConfig(), true));
@@ -229,6 +223,35 @@ public abstract class Spell implements Identifiable, Nameable, Describable, Conf
         map.put("cooldown-r", CooldownManager.formatCooldown(getRemainingCooldown()));
 
         return map;
+    }
+
+    @Override
+    public Map<String, String> getLangSource() {
+        var map = new HashMap<String, String>();
+
+        if (getConfig().isConfigurationSection("lang")) {
+            map.putAll(ConfigUtil.toStringMap(getConfig().getConfigurationSection("lang"), true));
+        }
+
+        return map;
+    }
+
+    /* Configuration */
+    @Override
+    public void setConfig(ConfigurationSection config) {
+        this.config = config;
+    }
+
+    @Override
+    public ConfigurationSection getConfig() {
+        return config;
+    }
+
+    @Override
+    public void loadConfig(ConfigurationSection config) {
+        enabled = config.getBoolean("enabled", enabled);
+        cooldown = config.getDouble("cooldown", cooldown);
+        cooldownId = config.getString("shared-cooldown-id", cooldownId);
     }
 
     /* Cooldowns */

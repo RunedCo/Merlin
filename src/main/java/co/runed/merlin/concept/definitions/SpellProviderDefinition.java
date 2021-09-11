@@ -1,12 +1,12 @@
 package co.runed.merlin.concept.definitions;
 
-import co.runed.dayroom.properties.Properties;
 import co.runed.bolster.game.traits.Trait;
 import co.runed.bolster.managers.PlayerManager;
 import co.runed.bolster.util.ItemBuilder;
 import co.runed.bolster.util.StringUtil;
 import co.runed.bolster.util.config.ConfigUtil;
 import co.runed.bolster.util.registries.Definition;
+import co.runed.dayroom.properties.Properties;
 import co.runed.merlin.Merlin;
 import co.runed.merlin.concept.items.ItemImpl;
 import co.runed.merlin.concept.spells.SpellDefinition;

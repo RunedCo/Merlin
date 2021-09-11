@@ -9,6 +9,8 @@ import co.runed.bolster.util.IconPreview;
 import co.runed.bolster.util.Owned;
 import co.runed.bolster.util.config.ConfigUtil;
 import co.runed.bolster.util.config.Configurable;
+import co.runed.bolster.util.lang.Lang;
+import co.runed.bolster.util.lang.LangProvider;
 import co.runed.dayroom.util.Describable;
 import co.runed.dayroom.util.Enableable;
 import co.runed.dayroom.util.Identifiable;
@@ -22,12 +24,9 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
-public abstract class SpellProvider extends TraitProvider implements Identifiable, Nameable, Describable, Configurable, Owned, Enableable, DamageSource, IconPreview {
+public abstract class SpellProvider extends TraitProvider implements Identifiable, Nameable, Describable, Configurable, Owned, Enableable, DamageSource, IconPreview, LangProvider {
     public static final String CONFIG_KEY_HEALTH = "health";
 
     private boolean enabled = false;
@@ -39,6 +38,7 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
     private String name;
     private String description;
     private AttributeModifier maxHealthModifier;
+    private Map<String, String> langSource = new HashMap<>();
 
     public SpellProvider(SpellProviderDefinition<?> definition) {
         this.definition = definition;
@@ -79,7 +79,7 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
             maxHealthModifier = new AttributeModifier(UUID.randomUUID(), getId() + "_max_health", getTrait(Traits.MAX_HEALTH), AttributeModifier.Operation.ADD_NUMBER);
 
             attribute.addModifier(maxHealthModifier);
-            
+
             getOwner().setHealth(attribute.getValue());
         }
     }
@@ -123,9 +123,22 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
         name = config.getString("name", name);
         setTrait(Traits.MAX_HEALTH, config.getDouble(CONFIG_KEY_HEALTH, getTrait(Traits.MAX_HEALTH)));
 
+        var langConfig = ConfigUtil.create();
+
+        if (config.isConfigurationSection("lang")) {
+            langConfig = config.getConfigurationSection("lang");
+
+            langSource = ConfigUtil.toStringMap(langConfig, true);
+        }
+
         for (var spell : spells) {
             if (config.isConfigurationSection(spell.getId())) {
-                spell.loadConfig(Objects.requireNonNull(config.getConfigurationSection(spell.getId())));
+                var spellConfig = config.getConfigurationSection(spell.getId());
+
+                spellConfig.set("lang", langConfig);
+
+                spell.setConfig(spellConfig);
+                spell.loadConfig(spellConfig);
             }
         }
     }
@@ -137,9 +150,7 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
 
     @Override
     public String getName() {
-        if (name == null) return getId();
-
-        return name;
+        return new Lang(getType().getId() + "." + getId() + ".name").withDefault(name).with(this).toLegacyString();
     }
 
     public void setName(String name) {
@@ -153,6 +164,16 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public Map<String, String> getLangReplacements() {
+        return new HashMap<>();
+    }
+
+    @Override
+    public Map<String, String> getLangSource() {
+        return langSource;
     }
 
     @Override
