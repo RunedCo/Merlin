@@ -12,6 +12,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class InteractTrigger extends AbstractItemEventTrigger<PlayerInteractEvent> {
+    private boolean cancelled = false;
 
     public InteractTrigger(PlayerInteractEvent event) {
         super(event, event.getItem());
@@ -75,6 +76,13 @@ public abstract class InteractTrigger extends AbstractItemEventTrigger<PlayerInt
     public boolean isCancelled() {
         if (getBaseEvent().useItemInHand() == Event.Result.DENY && getBaseEvent().useInteractedBlock() == Event.Result.DENY) return true;
 
-        return super.isCancelled();
+        return this.cancelled;
+    }
+
+    @Override
+    public void setCancelled(boolean cancelled) {
+        super.setCancelled(cancelled);
+
+        this.cancelled = true;
     }
 }
