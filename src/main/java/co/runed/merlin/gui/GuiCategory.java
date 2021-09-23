@@ -5,15 +5,13 @@ import co.runed.bolster.gui.Gui;
 import co.runed.bolster.gui.GuiConstants;
 import co.runed.bolster.util.Category;
 import co.runed.bolster.v1_16_R3.CraftUtil;
-import co.runed.merlin.core.ItemManager;
-import co.runed.merlin.items.Item;
+import co.runed.merlin.items.ItemManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.inventory.ItemStack;
 import org.ipvp.canvas.ClickInformation;
 import org.ipvp.canvas.Menu;
 import org.ipvp.canvas.mask.BinaryMask;
-import org.ipvp.canvas.mask.Mask;
 import org.ipvp.canvas.paginate.PaginatedMenuBuilder;
 import org.ipvp.canvas.slot.SlotSettings;
 import org.ipvp.canvas.template.StaticItemTemplate;
@@ -21,13 +19,11 @@ import org.ipvp.canvas.type.ChestMenu;
 
 import java.util.List;
 
-public class GuiCategory extends Gui
-{
+public class GuiCategory extends Gui {
     Category category;
     List<ItemStack> items;
 
-    public GuiCategory(Gui previousGui, Category category, List<ItemStack> items)
-    {
+    public GuiCategory(Gui previousGui, Category category, List<ItemStack> items) {
         super(previousGui);
 
         this.previousGui = previousGui;
@@ -36,12 +32,10 @@ public class GuiCategory extends Gui
     }
 
     @Override
-    public String getTitle(Player player)
-    {
-        String title = this.category.getName();
+    public String getTitle(Player player) {
+        var title = this.category.getName();
 
-        if (this.previousGui != null)
-        {
+        if (this.previousGui != null) {
             title = this.previousGui.getTitle(player) + " - " + title;
         }
 
@@ -49,10 +43,9 @@ public class GuiCategory extends Gui
     }
 
     @Override
-    public Menu draw(Player player)
-    {
-        ChestMenu.Builder pageTemplate = ChestMenu.builder(6).title("Items - " + category.getName());
-        Mask itemSlots = BinaryMask.builder(pageTemplate.getDimensions())
+    public Menu draw(Player player) {
+        var pageTemplate = ChestMenu.builder(6).title("Items - " + category.getName());
+        var itemSlots = BinaryMask.builder(pageTemplate.getDimensions())
                 .pattern("111111111")
                 .pattern("111111111")
                 .pattern("111111111")
@@ -61,16 +54,15 @@ public class GuiCategory extends Gui
                 .pattern("000000000")
                 .build();
 
-        PaginatedMenuBuilder builder = PaginatedMenuBuilder.builder(pageTemplate)
+        var builder = PaginatedMenuBuilder.builder(pageTemplate)
                 .slots(itemSlots)
                 .nextButton(GuiConstants.GUI_ARROW_RIGHT)
                 .nextButtonSlot(51)
                 .previousButton(GuiConstants.GUI_ARROW_LEFT)
                 .previousButtonSlot(47);
 
-        for (ItemStack item : items)
-        {
-            SlotSettings settings = SlotSettings.builder()
+        for (var item : items) {
+            var settings = SlotSettings.builder()
                     .itemTemplate(new StaticItemTemplate(item))
                     .clickHandler(this::givePlayerItem)
                     .build();
@@ -78,29 +70,27 @@ public class GuiCategory extends Gui
             builder.addItem(settings);
         }
 
-        List<Menu> pages = builder.build();
+        var pages = builder.build();
 
         return pages.get(0);
     }
 
-    private void givePlayerItem(Player player, ClickInformation info)
-    {
-        int stackAmount = info.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY || info.getAction() == InventoryAction.DROP_ALL_SLOT ? 64 : 1;
-        ItemStack stack = info.getClickedSlot().getItem(player);
+    private void givePlayerItem(Player player, ClickInformation info) {
+        var stackAmount = info.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY || info.getAction() == InventoryAction.DROP_ALL_SLOT ? 64 : 1;
+        var stack = info.getClickedSlot().getItem(player);
         stackAmount = Math.min(stackAmount, stack.getMaxStackSize());
-        String itemId = ItemManager.getInstance().getItemIdFromStack(stack);
+        var itemDef = ItemManager.getInstance().getDefFrom(stack);
 
-        if (info.getAction() == InventoryAction.DROP_ALL_SLOT || info.getAction() == InventoryAction.DROP_ONE_SLOT)
-        {
-            Item item = ItemManager.getInstance().createItem(player, itemId);
+        if (info.getAction() == InventoryAction.DROP_ALL_SLOT || info.getAction() == InventoryAction.DROP_ONE_SLOT) {
+            var item = ItemManager.getInstance().getOrCreate(player, itemDef);
 
-            ItemStack itemStack = item.toItemStack();
+            var itemStack = item.toItemStack();
             itemStack.setAmount(stackAmount);
 
             CraftUtil.dropItem(player, itemStack);
             return;
         }
 
-        ItemManager.getInstance().giveItem(player, BolsterEntity.from(player).getPlayerInventory(), itemId, stackAmount);
+        ItemManager.getInstance().giveItem(player, BolsterEntity.from(player).getPlayerInventory(), itemDef, stackAmount);
     }
 }

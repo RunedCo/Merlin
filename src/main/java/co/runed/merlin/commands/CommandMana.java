@@ -13,54 +13,44 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommandMana extends CommandBase
-{
+public class CommandMana extends CommandBase {
     List<String> operations = new ArrayList<>();
     List<String> types = new ArrayList<>();
 
 
-    public CommandMana()
-    {
+    public CommandMana() {
         super("mana");
     }
 
-    public void run(CommandSender sender, Object[] args)
-    {
-        Player player = (Player) args[0];
-        String operation = (String) args[1];
-        String type = (String) args[2];
+    public void run(CommandSender sender, Object[] args) {
+        var player = (Player) args[0];
+        var operation = (String) args[1];
+        var type = (String) args[2];
 
-        if (operation.equals("get"))
-        {
-            if (type.equals("max"))
-            {
+        if (operation.equals("get")) {
+            if (type.equals("max")) {
                 player.sendMessage("Your maximum mana is " + ManaManager.getInstance().getMaximumMana(player));
             }
-            else
-            {
+            else {
                 player.sendMessage("You have " + ManaManager.getInstance().getCurrentMana(player) + " mana");
             }
 
             return;
         }
 
-        float amount = (float) args[3];
+        var amount = (float) args[3];
 
         if (operation.equals("subtract")) amount = amount * -1;
 
-        if (type.equals("max"))
-        {
-            if (operation.equals("add") || operation.equals("subtract"))
-            {
+        if (type.equals("max")) {
+            if (operation.equals("add") || operation.equals("subtract")) {
                 amount = ManaManager.getInstance().getMaximumMana(player) + amount;
             }
 
             ManaManager.getInstance().setMaximumMana(player, amount);
         }
-        else
-        {
-            if (operation.equals("add") || operation.equals("subtract"))
-            {
+        else {
+            if (operation.equals("add") || operation.equals("subtract")) {
                 amount = ManaManager.getInstance().getCurrentMana(player) + amount;
             }
 
@@ -69,8 +59,7 @@ public class CommandMana extends CommandBase
     }
 
     @Override
-    public CommandAPICommand build()
-    {
+    public CommandAPICommand build() {
         operations.add("set");
         operations.add("add");
         operations.add("subtract");

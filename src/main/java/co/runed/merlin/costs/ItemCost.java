@@ -1,100 +1,53 @@
 package co.runed.merlin.costs;
 
-import co.runed.bolster.entity.BolsterEntity;
-import co.runed.bolster.game.Cost;
-import co.runed.bolster.util.Definition;
-import co.runed.bolster.common.properties.Properties;
-import co.runed.merlin.abilities.AbilityProperties;
-import co.runed.merlin.conditions.item.HasItemCondition;
-import co.runed.merlin.core.ItemManager;
-import co.runed.merlin.items.Item;
-import co.runed.merlin.target.Target;
+import co.runed.merlin.items.ItemDefinition;
+import co.runed.merlin.items.ItemManager;
+import co.runed.merlin.spells.CastResult;
+import co.runed.merlin.triggers.Trigger;
 import org.bukkit.GameMode;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 
-public class ItemCost extends Cost
-{
-    Definition<Item> itemDef;
-    int count;
-    HasItemCondition condition;
+public class ItemCost extends Cost {
+    private int amount = 1;
+    private ItemDefinition item = null;
 
-    public ItemCost(int count)
-    {
-        this((Definition<Item>) null, count);
+    public ItemCost(int amount, ItemDefinition item) {
+        super();
+
+        this.amount = amount;
+        this.item = item;
     }
 
-    public ItemCost(Item item)
-    {
-        this(item, 1);
-    }
-
-    public ItemCost(Item item, int count)
-    {
-        this(item.getDefinition(), count);
-    }
-
-    public ItemCost(Definition<Item> itemDef)
-    {
-        this(itemDef, 1);
-    }
-
-    public ItemCost(Definition<Item> itemDef, int count)
-    {
-        this.itemDef = itemDef;
-        this.count = count;
-
-        this.condition = new HasItemCondition(Target.CASTER, itemDef, count);
+    public ItemCost(int amount) {
+        this(amount, null);
     }
 
     @Override
-    public boolean evaluate(Properties properties)
-    {
-        return this.condition.evaluate(null, properties);
+    public CastResult evaluate(Trigger trigger) {
+        var context = trigger.getContext();
+        var entity = context.getCaster().getEntity();
+
+        if (item == null) item = context.getItem().getDefinition();
+        if (item == null) return CastResult.fail();
+
+        if (!ItemManager.getInstance().anyInventoryContainsAtLeast(entity, item, amount)) return CastResult.fail();
+
+        return CastResult.success();
     }
 
     @Override
-    public boolean run(Properties properties)
-    {
-        LivingEntity entity = properties.get(AbilityProperties.CASTER).getBukkit();
+    public void run(Trigger trigger) {
+        var context = trigger.getContext();
+        var caster = context.getCaster();
 
-        // If player is in creative don't remove items
-        if (entity instanceof Player && ((Player) entity).getGameMode() == GameMode.CREATIVE) return true;
+        if (caster.getEntity() instanceof Player player && player.getGameMode() == GameMode.CREATIVE) return;
 
-        Item item;
+        if (item == null) return;
 
-        if (this.itemDef == null)
-        {
-            item = properties.get(AbilityProperties.ITEM);
+        for (var inv : caster.toBolster().getInventories()) {
+            var success = ItemManager.getInstance().removeItem(inv, item, amount);
 
-            if (item == null) return false;
+            if (success) return;
         }
-        else
-        {
-            item = ItemManager.getInstance().createItem(entity, this.itemDef);
-        }
-
-        int count = this.count;
-
-        if (count == -1 && properties.contains(AbilityProperties.ITEM_STACK))
-        {
-            count = properties.get(AbilityProperties.ITEM_STACK).getAmount();
-        }
-
-        for (Inventory inv : BolsterEntity.from(entity).getInventories())
-        {
-            boolean success = ItemManager.getInstance().removeItem(inv, item, count);
-
-            if (success) return true;
-        }
-
-        return false;
-    }
-
-    @Override
-    public String getErrorMessage(Properties properties)
-    {
-        return null;
     }
 }
