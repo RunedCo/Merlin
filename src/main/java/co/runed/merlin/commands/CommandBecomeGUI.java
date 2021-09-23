@@ -1,8 +1,8 @@
 package co.runed.merlin.commands;
 
 import co.runed.bolster.commands.CommandBase;
-import co.runed.merlin.concept.MerlinRegistries;
-import co.runed.merlin.concept.classes.ClassImpl;
+import co.runed.merlin.classes.ClassImpl;
+import co.runed.merlin.core.MerlinRegistries;
 import dev.jorel.commandapi.CommandAPICommand;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

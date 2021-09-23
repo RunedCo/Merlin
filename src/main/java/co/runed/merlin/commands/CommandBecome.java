@@ -2,8 +2,8 @@ package co.runed.merlin.commands;
 
 import co.runed.bolster.commands.CommandBase;
 import co.runed.bolster.util.registries.Registry;
-import co.runed.merlin.concept.MerlinRegistries;
-import co.runed.merlin.concept.classes.ClassManager;
+import co.runed.merlin.classes.ClassManager;
+import co.runed.merlin.core.MerlinRegistries;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.StringArgument;
 import org.bukkit.command.CommandSender;

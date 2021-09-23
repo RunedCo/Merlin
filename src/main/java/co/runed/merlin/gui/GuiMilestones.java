@@ -6,7 +6,7 @@ import co.runed.bolster.gui.Gui;
 import co.runed.bolster.gui.GuiConstants;
 import co.runed.bolster.managers.PlayerManager;
 import co.runed.bolster.util.ItemBuilder;
-import co.runed.merlin.concept.items.ItemDefinition;
+import co.runed.merlin.items.ItemDefinition;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;

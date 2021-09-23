@@ -3,13 +3,13 @@ package co.runed.merlin;
 import co.runed.bolster.Bolster;
 import co.runed.bolster.managers.CommandManager;
 import co.runed.bolster.util.registries.Registries;
+import co.runed.merlin.classes.ClassManager;
 import co.runed.merlin.commands.*;
-import co.runed.merlin.concept.classes.ClassManager;
-import co.runed.merlin.concept.items.ItemManager;
-import co.runed.merlin.concept.items.Items;
-import co.runed.merlin.concept.spells.SpellManager;
 import co.runed.merlin.core.ManaManager;
 import co.runed.merlin.core.MerlinTraits;
+import co.runed.merlin.core.SpellManager;
+import co.runed.merlin.items.ItemManager;
+import co.runed.merlin.items.Items;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Merlin extends JavaPlugin {

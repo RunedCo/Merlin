@@ -5,7 +5,7 @@ import co.runed.bolster.gui.Gui;
 import co.runed.bolster.gui.GuiConstants;
 import co.runed.bolster.util.Category;
 import co.runed.bolster.v1_16_R3.CraftUtil;
-import co.runed.merlin.concept.items.ItemManager;
+import co.runed.merlin.items.ItemManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.inventory.ItemStack;

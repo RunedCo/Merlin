@@ -3,7 +3,7 @@ package co.runed.merlin.gui;
 import co.runed.bolster.gui.Gui;
 import co.runed.bolster.gui.GuiConstants;
 import co.runed.bolster.util.Category;
-import co.runed.merlin.concept.MerlinRegistries;
+import co.runed.merlin.core.MerlinRegistries;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.ipvp.canvas.Menu;
