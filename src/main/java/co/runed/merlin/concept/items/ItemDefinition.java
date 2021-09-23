@@ -22,6 +22,7 @@ public class ItemDefinition extends SpellProviderDefinition<ItemImpl> {
     private final Map<SpellDefinition, ItemRequirement> itemRequirements = new HashMap<>();
     private int maxItems = -1;
     private boolean clearOnRemove = true;
+    private boolean droppable = false;
     private AmmoDefinition ammoDefinition = null;
     private int maxAmmo = 64;
     private ItemBuilder baseItemStack = new ItemBuilder(Material.STICK);
@@ -62,6 +63,12 @@ public class ItemDefinition extends SpellProviderDefinition<ItemImpl> {
     @Override
     public ItemDefinition setName(String name) {
         return (ItemDefinition) super.setName(name);
+    }
+
+    public ItemDefinition setDroppable(boolean droppable) {
+        this.droppable = droppable;
+
+        return this;
     }
 
     public ItemDefinition setMaxInInventory(int maxItems) {
@@ -155,6 +162,7 @@ public class ItemDefinition extends SpellProviderDefinition<ItemImpl> {
         var value = super.preCreate(output);
 
         value.setItemRequirements(itemRequirements);
+        value.setDroppable(droppable);
 
         return value;
     }

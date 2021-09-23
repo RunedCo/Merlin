@@ -3,7 +3,7 @@ spell:
     cooldown: "<red>%spell% is on cooldown (%cooldown-r% seconds remaining)</red>"
     ready: "<green>%spell% is ready!</green>"
 
-items:
+item:
   runeblade:
     name: "<aqua>Runebladex</aqua>"
     tooltip: "R-Click: Dash!"

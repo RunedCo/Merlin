@@ -1,15 +1,13 @@
 package co.runed.merlin.concept.spells.dvz.longbow;
 
-import co.runed.merlin.concept.CastContext;
 import co.runed.merlin.concept.items.ItemDefinition;
 import co.runed.merlin.concept.items.ammo.AmmoImpl;
 import co.runed.merlin.concept.spells.CastResult;
 import co.runed.merlin.concept.spells.Spell;
 import co.runed.merlin.concept.spells.SpellDefinition;
 import co.runed.merlin.concept.spells.SpellManager;
+import co.runed.merlin.concept.triggers.SpellTrigger;
 import co.runed.merlin.concept.triggers.interact.InteractParams;
-import co.runed.merlin.concept.triggers.interact.LeftClickTrigger;
-import co.runed.merlin.concept.triggers.projectile.OnShootParams;
 import co.runed.merlin.concept.triggers.projectile.OnShootTrigger;
 import co.runed.merlin.concept.util.Projectile;
 import co.runed.merlin.concept.util.task.RepeatingTask;
@@ -24,25 +22,25 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 
-public class TNTBowShoot extends Spell implements OnShootTrigger, LeftClickTrigger {
+public class TNTBowShoot extends Spell {
     public TNTBowShoot(@NotNull SpellDefinition definition) {
         super(definition);
     }
 
-    @Override
-    public CastResult onShoot(CastContext context, OnShootParams params) {
+    @SpellTrigger
+    public CastResult onShoot(OnShootTrigger trigger) {
         var caster = context.getCasterEntity();
-        params.setSpawnProjectile(false);
-        params.setConsumeItem(false);
+        trigger.setSpawnProjectile(false);
+        trigger.setConsumeItem(false);
 
         var projectile = new Projectile(EntityType.ARROW)
                 .owner(caster)
-                .location(params.getProjectileLocation())
-                .velocity(params.getVelocity())
+                .location(trigger.getProjectileLocation())
+                .velocity(trigger.getVelocity())
                 .removeOnFinish(false)
                 .onStart((proj) -> {
                     var entity = proj.getEntity();
-                    var armorStand = (ArmorStand) context.getWorld().spawnEntity(params.getProjectileLocation(), EntityType.ARMOR_STAND);
+                    var armorStand = (ArmorStand) context.getWorld().spawnEntity(trigger.getProjectileLocation(), EntityType.ARMOR_STAND);
                     armorStand.setBasePlate(false);
                     armorStand.setInvulnerable(true);
                     armorStand.setSilent(true);
@@ -88,7 +86,7 @@ public class TNTBowShoot extends Spell implements OnShootTrigger, LeftClickTrigg
     }
 
     @Override
-    public CastResult onLeftClick(CastContext context, InteractParams params) {
+    public CastResult onLeftClick(InteractParams params) {
         if (getParent().getDefinition() instanceof ItemDefinition itemDef) {
             var ammo = (AmmoImpl) SpellManager.getInstance().getOrCreateProvider(context.getCaster().getEntity(), itemDef.getAmmoDefinition());
             ammo.addAmmo(1);

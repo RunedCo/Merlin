@@ -228,7 +228,7 @@ public class SpellManager extends Manager {
             if (result.isSuccess()) {
                 result = spell.postCast(castContext);
 
-                if (spell.hasOption(SpellOption.ALERT_WHEN_READY)) {
+                if (spell.hasOption(SpellOption.ALERT_WHEN_READY) && spell.isOnCooldown()) {
                     var alertTask = new Task()
                             .delay(TimeUtil.toTicks(TimeUtil.fromSeconds(spell.getRemainingCooldown())))
                             .run(() -> {
