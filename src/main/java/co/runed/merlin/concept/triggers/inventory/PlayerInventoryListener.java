@@ -21,15 +21,11 @@ public class PlayerInventoryListener implements Listener {
     /* Events for changing selected item */
     private void onSelect(Event event, LivingEntity entity, ItemStack newItem, ItemStack oldItem) {
         if (newItem != null) {
-            var params = new SelectItemParams(event, newItem);
-
-            SpellManager.getInstance().run(entity, SelectItemTrigger.class, (spell, context) -> spell.onSelectItem(context.setParams(params), params));
+            SpellManager.getInstance().run(entity, new SelectItemTrigger(event, newItem));
         }
 
         if (oldItem != null) {
-            var params = new SelectItemParams(event, oldItem);
-
-            SpellManager.getInstance().run(entity, DeselectItemTrigger.class, (spell, context) -> spell.onDeselectItem(context.setParams(params), params));
+            SpellManager.getInstance().run(entity, new DeselectItemTrigger(event, oldItem));
         }
     }
 
@@ -90,8 +86,7 @@ public class PlayerInventoryListener implements Listener {
             event.setResult(Event.Result.DENY);
         }
 
-        var params = new ClickInventoryParams(event);
-        SpellManager.getInstance().run(player, ClickInventoryTrigger.class, (spell, context) -> spell.onClickInventory(context.setParams(params), params));
+        SpellManager.getInstance().run(player, new ClickInventoryTrigger(event));
     }
 
     // TODO player open and close inv events

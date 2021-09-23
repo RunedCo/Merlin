@@ -1,6 +1,6 @@
 package co.runed.merlin.concept.triggers.interact;
 
-import co.runed.merlin.concept.triggers.AbstractItemEventParams;
+import co.runed.merlin.concept.triggers.AbstractItemEventTrigger;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -11,9 +11,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.jetbrains.annotations.NotNull;
 
-public class InteractParams extends AbstractItemEventParams<PlayerInteractEvent> {
+public abstract class InteractTrigger extends AbstractItemEventTrigger<PlayerInteractEvent> {
 
-    public InteractParams(PlayerInteractEvent event) {
+    public InteractTrigger(PlayerInteractEvent event) {
         super(event, event.getItem());
     }
 
@@ -69,5 +69,12 @@ public class InteractParams extends AbstractItemEventParams<PlayerInteractEvent>
 
     public EquipmentSlot getEquipmentSlot() {
         return getBaseEvent().getHand();
+    }
+
+    @Override
+    public boolean isCancelled() {
+        if (getBaseEvent().useItemInHand() == Event.Result.DENY && getBaseEvent().useInteractedBlock() == Event.Result.DENY) return true;
+
+        return super.isCancelled();
     }
 }

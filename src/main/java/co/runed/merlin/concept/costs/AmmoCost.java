@@ -1,10 +1,10 @@
 package co.runed.merlin.concept.costs;
 
-import co.runed.merlin.concept.CastContext;
 import co.runed.merlin.concept.items.ItemManager;
 import co.runed.merlin.concept.items.ammo.AmmoDefinition;
 import co.runed.merlin.concept.items.ammo.AmmoImpl;
 import co.runed.merlin.concept.spells.CastResult;
+import co.runed.merlin.concept.triggers.Trigger;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
@@ -24,7 +24,8 @@ public class AmmoCost extends Cost {
     }
 
     @Override
-    public CastResult evaluate(CastContext context) {
+    public CastResult evaluate(Trigger trigger) {
+        var context = trigger.getContext();
         var entity = context.getCaster().getEntity();
 
         if (entity instanceof Player player && player.getGameMode() == GameMode.CREATIVE) return CastResult.success();
@@ -46,7 +47,8 @@ public class AmmoCost extends Cost {
     }
 
     @Override
-    public void run(CastContext context) {
+    public void run(Trigger trigger) {
+        var context = trigger.getContext();
         var caster = context.getCaster();
 
         if (caster.getEntity() instanceof Player player && player.getGameMode() == GameMode.CREATIVE) return;

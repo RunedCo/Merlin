@@ -4,16 +4,17 @@ import co.runed.bolster.managers.Manager;
 import co.runed.bolster.util.TimeUtil;
 import co.runed.bolster.util.lang.Lang;
 import co.runed.bolster.util.registries.Definition;
+import co.runed.dayroom.util.ReflectionUtil;
 import co.runed.merlin.Merlin;
 import co.runed.merlin.concept.CastContext;
 import co.runed.merlin.concept.definitions.SpellProviderDefinition;
 import co.runed.merlin.concept.spells.type.RepeatingSpellType;
+import co.runed.merlin.concept.triggers.SpellTrigger;
 import co.runed.merlin.concept.triggers.Trigger;
 import co.runed.merlin.concept.triggers.interact.PlayerInteractListener;
 import co.runed.merlin.concept.triggers.inventory.PlayerInventoryListener;
-import co.runed.merlin.concept.triggers.lifecycle.OnTriggerTrigger;
+import co.runed.merlin.concept.triggers.lifecycle.OnTrigger;
 import co.runed.merlin.concept.triggers.lifecycle.TickTrigger;
-import co.runed.merlin.concept.triggers.lifecycle.TriggerParams;
 import co.runed.merlin.concept.triggers.movement.EntityMovementListener;
 import co.runed.merlin.concept.triggers.projectile.EntityProjectileListener;
 import co.runed.merlin.concept.util.task.Task;
@@ -25,8 +26,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.lang.reflect.Method;
 import java.util.*;
-import java.util.function.BiFunction;
 
 public class SpellManager extends Manager {
     public static final Sound ALERT_READY_SOUND = Sound.sound(Key.key("block.note_block.pling"), Sound.Source.PLAYER, 1, 1.5F);
@@ -34,6 +35,8 @@ public class SpellManager extends Manager {
     private final Map<UUID, Collection<SpellProvider>> spellProviders = new HashMap<>();
     private final Map<UUID, Collection<PassiveSpellContainer>> passives = new HashMap<>();
     private final Map<UUID, Long> lastErrorTime = new HashMap<>();
+
+    private Map<Class<? extends Spell>, Map<Class<? extends Trigger>, List<Method>>> spellMethods = new HashMap<>();
 
     private static SpellManager _instance;
 
@@ -85,6 +88,10 @@ public class SpellManager extends Manager {
         }
 
         for (var spell : provider.getSpells()) {
+            var spellClass = spell.getClass();
+
+            parseMethods(spellClass);
+
             if (spell.getType() instanceof RepeatingSpellType repeating && repeating.getFrequency() > 0L) {
                 passives.putIfAbsent(uuid, new HashSet<>());
 
@@ -98,6 +105,35 @@ public class SpellManager extends Manager {
 
         provider.setOwner(entity);
         provider.setEnabled(true);
+    }
+
+    private void parseMethods(Class<? extends Spell> spellClass) {
+        if (!spellMethods.containsKey(spellClass)) {
+            spellMethods.put(spellClass, new HashMap<>());
+
+            var methodMap = spellMethods.get(spellClass);
+
+            for (var method : ReflectionUtil.getMethodsAnnotatedWith(spellClass, SpellTrigger.class)) {
+                var paramTypes = method.getParameterTypes();
+
+                if (paramTypes.length != 1 || method.getReturnType() != CastResult.class) break;
+
+                var param = paramTypes[0];
+
+                if (!Trigger.class.isAssignableFrom(param)) break;
+
+                methodMap.putIfAbsent((Class<? extends Trigger>) param, new ArrayList<>());
+
+                var methodList = methodMap.get(param);
+
+                methodList.add(method);
+            }
+        }
+    }
+
+    private List<Method> getMethods(Class<? extends Spell> spellClass, Class<? extends Trigger> triggerClass) {
+        return spellMethods.getOrDefault(spellClass, new HashMap<>())
+                .getOrDefault(triggerClass, new ArrayList<>());
     }
 
     public void removeProvider(LivingEntity entity, SpellProvider provider) {
@@ -158,6 +194,8 @@ public class SpellManager extends Manager {
     public Collection<Spell> getSpells(LivingEntity entity) {
         // TODO(Jono): SORT BY SPELL PRIORITY
 
+        if (entity == null) return new HashSet<>();
+
         var spells = new ArrayList<Spell>();
         var spellProviders = this.spellProviders.getOrDefault(entity.getUniqueId(), new HashSet<>());
 
@@ -172,13 +210,17 @@ public class SpellManager extends Manager {
         return spells;
     }
 
-    public Collection<Spell> getSpells(LivingEntity entity, Class<? extends Trigger> triggerClass) {
+    private boolean hasTrigger(Spell spell, Trigger trigger) {
+        return spellMethods.getOrDefault(spell.getClass(), new HashMap<>()).containsKey(trigger.getClass());
+    }
+
+    public Collection<Spell> getSpells(LivingEntity entity, Trigger trigger) {
         var spells = new HashSet<Spell>();
 
         for (var spell : getSpells(entity)) {
             var spellClass = spell.getClass();
 
-            if (!triggerClass.isAssignableFrom(spellClass)) continue;
+            if (!hasTrigger(spell, trigger)) continue;
 
             spells.add(spell);
         }
@@ -186,30 +228,33 @@ public class SpellManager extends Manager {
         return spells;
     }
 
-    public <T extends Trigger> void run(LivingEntity entity, Class<T> trigger, BiFunction<T, CastContext, CastResult> func) {
+    public void run(LivingEntity entity, Trigger trigger) {
         var spells = SpellManager.getInstance().getSpells(entity, trigger);
 
-        CastContext castContext = null;
         for (var spell : spells) {
-            if (castContext != null && castContext.isCancelled() && !spell.hasOption(SpellOption.IGNORE_CANCELLED)) continue;
+            if (trigger.isCancelled() && !spell.hasOption(SpellOption.IGNORE_CANCELLED)) continue;
 
-            castContext = run(spell, trigger, func);
+            for (var method : getMethods(spell.getClass(), trigger.getClass())) {
+                run(spell, trigger, method);
+            }
+
         }
     }
 
-    public <T extends Trigger> CastContext run(Spell spell, Class<T> trigger, BiFunction<T, CastContext, CastResult> func) {
+    public CastResult run(Spell spell, Trigger trigger, Method method) {
         if (spell == null) return null;
 
         var entity = spell.getOwner();
         var castContext = new CastContext(entity, spell);
+        trigger.setContext(castContext);
 
         try {
-            if (trigger != OnTriggerTrigger.class) run(entity, OnTriggerTrigger.class, (spl, context) -> spl.onTrigger(context, new TriggerParams(trigger, castContext)));
+            if (!(trigger instanceof OnTrigger)) run(entity, new OnTrigger(trigger, method));
 
-            var result = spell.preCast(castContext);
+            var result = spell.preCast(trigger);
 
             if (result.isSuccess()) {
-                result = func.apply((T) spell, castContext);
+                result = (CastResult) method.invoke(spell, trigger);
             }
 
             if (!result.shouldContinue()) {
@@ -221,12 +266,10 @@ public class SpellManager extends Manager {
 
                     this.lastErrorTime.put(entity.getUniqueId(), System.currentTimeMillis());
                 }
-
-                return castContext;
             }
 
             if (result.isSuccess()) {
-                result = spell.postCast(castContext);
+                result = spell.postCast(trigger);
 
                 if (spell.hasOption(SpellOption.ALERT_WHEN_READY) && spell.isOnCooldown()) {
                     var alertTask = new Task()
@@ -237,12 +280,14 @@ public class SpellManager extends Manager {
                             });
                 }
             }
+
+            return result;
         }
         catch (Exception e) {
             e.printStackTrace();
         }
 
-        return castContext;
+        return CastResult.fail();
     }
 
     public static SpellManager getInstance() {
@@ -270,7 +315,7 @@ public class SpellManager extends Manager {
         }
 
         public void run() {
-            SpellManager.getInstance().run(spell, TickTrigger.class, TickTrigger::onTick);
+            SpellManager.getInstance().run(spell.getOwner(), new TickTrigger());
         }
     }
 }

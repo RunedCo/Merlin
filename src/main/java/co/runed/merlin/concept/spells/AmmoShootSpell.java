@@ -1,12 +1,11 @@
 package co.runed.merlin.concept.spells;
 
-import co.runed.merlin.concept.CastContext;
-import co.runed.merlin.concept.triggers.projectile.OnShootParams;
+import co.runed.merlin.concept.triggers.SpellTrigger;
 import co.runed.merlin.concept.triggers.projectile.OnShootTrigger;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class AmmoShootSpell extends Spell implements OnShootTrigger {
+public class AmmoShootSpell extends Spell {
     private boolean shootArrow = false;
 
     public AmmoShootSpell(@NotNull SpellDefinition definition) {
@@ -19,13 +18,14 @@ public class AmmoShootSpell extends Spell implements OnShootTrigger {
         this.shootArrow = shootArrow;
     }
 
-    @Override
-    public CastResult onShoot(CastContext context, OnShootParams params) {
+    @SpellTrigger
+    public CastResult onShoot(OnShootTrigger trigger) {
+        var context = trigger.getContext();
         var caster = context.getCaster().getEntity();
 
-        params.setConsumeItem(false);
+        trigger.setConsumeItem(false);
 
-        if (!shootArrow) params.setSpawnProjectile(false);
+        if (!shootArrow) trigger.setSpawnProjectile(false);
 
         if (caster instanceof Player player) {
             player.updateInventory();

@@ -20,13 +20,11 @@ public class PlayerInteractListener implements Listener {
 
         if (event.getAction() == Action.PHYSICAL) return;
 
-        var params = new InteractParams(event);
-
         if (event.getAction() == Action.LEFT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_AIR) {
-            SpellManager.getInstance().run(player, LeftClickTrigger.class, (spell, context) -> spell.onLeftClick(context.setParams(params), params));
+            SpellManager.getInstance().run(player, new LeftClickTrigger(event));
         }
         else {
-            SpellManager.getInstance().run(player, RightClickTrigger.class, (spell, context) -> spell.onRightClick(context.setParams(params), params));
+            SpellManager.getInstance().run(player, new RightClickTrigger(event));
         }
     }
 }

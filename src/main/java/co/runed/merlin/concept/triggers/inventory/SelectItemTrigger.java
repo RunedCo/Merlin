@@ -1,9 +1,11 @@
 package co.runed.merlin.concept.triggers.inventory;
 
-import co.runed.merlin.concept.CastContext;
-import co.runed.merlin.concept.spells.CastResult;
-import co.runed.merlin.concept.triggers.Trigger;
+import co.runed.merlin.concept.triggers.AbstractItemEventTrigger;
+import org.bukkit.event.Event;
+import org.bukkit.inventory.ItemStack;
 
-public interface SelectItemTrigger extends Trigger {
-    CastResult onSelectItem(CastContext context, SelectItemParams params);
+public class SelectItemTrigger extends AbstractItemEventTrigger<Event> {
+    public SelectItemTrigger(Event baseEvent, ItemStack itemStack) {
+        super(baseEvent, itemStack);
+    }
 }

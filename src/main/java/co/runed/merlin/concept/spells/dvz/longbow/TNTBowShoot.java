@@ -7,7 +7,7 @@ import co.runed.merlin.concept.spells.Spell;
 import co.runed.merlin.concept.spells.SpellDefinition;
 import co.runed.merlin.concept.spells.SpellManager;
 import co.runed.merlin.concept.triggers.SpellTrigger;
-import co.runed.merlin.concept.triggers.interact.InteractParams;
+import co.runed.merlin.concept.triggers.interact.LeftClickTrigger;
 import co.runed.merlin.concept.triggers.projectile.OnShootTrigger;
 import co.runed.merlin.concept.util.Projectile;
 import co.runed.merlin.concept.util.task.RepeatingTask;
@@ -29,6 +29,7 @@ public class TNTBowShoot extends Spell {
 
     @SpellTrigger
     public CastResult onShoot(OnShootTrigger trigger) {
+        var context = trigger.getContext();
         var caster = context.getCasterEntity();
         trigger.setSpawnProjectile(false);
         trigger.setConsumeItem(false);
@@ -85,8 +86,10 @@ public class TNTBowShoot extends Spell {
         return CastResult.success();
     }
 
-    @Override
-    public CastResult onLeftClick(InteractParams params) {
+    @SpellTrigger
+    public CastResult onLeftClick(LeftClickTrigger trigger) {
+        var context = trigger.getContext();
+
         if (getParent().getDefinition() instanceof ItemDefinition itemDef) {
             var ammo = (AmmoImpl) SpellManager.getInstance().getOrCreateProvider(context.getCaster().getEntity(), itemDef.getAmmoDefinition());
             ammo.addAmmo(1);

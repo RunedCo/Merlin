@@ -4,27 +4,27 @@ import co.runed.bolster.fx.particles.ParticleData;
 import co.runed.bolster.fx.particles.ParticleGroup;
 import co.runed.bolster.fx.particles.ParticleSet;
 import co.runed.bolster.fx.particles.ParticleType;
-import co.runed.merlin.concept.CastContext;
 import co.runed.merlin.concept.spells.CastResult;
 import co.runed.merlin.concept.spells.Spell;
 import co.runed.merlin.concept.spells.SpellDefinition;
-import co.runed.merlin.concept.triggers.movement.SneakParams;
-import co.runed.merlin.concept.triggers.movement.SneakTrigger;
+import co.runed.merlin.concept.triggers.SpellTrigger;
+import co.runed.merlin.concept.triggers.movement.OnSneakTrigger;
 import co.runed.merlin.concept.util.Leap;
 import co.runed.merlin.concept.util.task.RepeatingTask;
 import org.bukkit.Particle;
 import org.jetbrains.annotations.NotNull;
 
-public class RocketJump extends Spell implements SneakTrigger {
+public class RocketJump extends Spell {
     private static final ParticleType BOOTS_LAVA = new ParticleType("boots_lava", new ParticleGroup(new ParticleData(Particle.LAVA).setSpeed(0)));
 
     public RocketJump(@NotNull SpellDefinition definition) {
         super(definition);
     }
 
-    @Override
-    public CastResult onSneak(CastContext context, SneakParams params) {
-        if (params.isSneaking()) return CastResult.skip();
+    @SpellTrigger
+    public CastResult onSneak(OnSneakTrigger trigger) {
+        var context = trigger.getContext();
+        if (trigger.isSneaking()) return CastResult.skip();
 
         var entity = context.getCasterEntity();
 

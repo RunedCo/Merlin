@@ -5,11 +5,10 @@ import co.runed.bolster.damage.DamageType;
 import co.runed.bolster.fx.particles.ParticleData;
 import co.runed.bolster.fx.particles.ParticleGroup;
 import co.runed.bolster.fx.particles.ParticleType;
-import co.runed.merlin.concept.CastContext;
 import co.runed.merlin.concept.spells.CastResult;
 import co.runed.merlin.concept.spells.Spell;
 import co.runed.merlin.concept.spells.SpellDefinition;
-import co.runed.merlin.concept.triggers.interact.InteractParams;
+import co.runed.merlin.concept.triggers.SpellTrigger;
 import co.runed.merlin.concept.triggers.interact.LeftClickTrigger;
 import co.runed.merlin.concept.triggers.interact.RightClickTrigger;
 import co.runed.merlin.concept.util.Projectile;
@@ -20,7 +19,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.jetbrains.annotations.NotNull;
 
-public class WandBlast extends Spell implements RightClickTrigger, LeftClickTrigger {
+public class WandBlast extends Spell {
     private static final ParticleType WAND_BLAST = new ParticleType("wand_blast", new ParticleGroup()
             .add(new ParticleData(Particle.REDSTONE)
                     .setColor(Color.PURPLE))
@@ -43,8 +42,9 @@ public class WandBlast extends Spell implements RightClickTrigger, LeftClickTrig
         super(definition);
     }
 
-    @Override
-    public CastResult onRightClick(CastContext context, InteractParams params) {
+    @SpellTrigger
+    public CastResult onRightClick(RightClickTrigger trigger) {
+        var context = trigger.getContext();
         var caster = context.getCasterEntity();
         var world = caster.getWorld();
 
@@ -68,9 +68,11 @@ public class WandBlast extends Spell implements RightClickTrigger, LeftClickTrig
         return CastResult.success();
     }
 
-    @Override
-    public CastResult onLeftClick(CastContext context, InteractParams params) {
+    @SpellTrigger
+    public CastResult onLeftClick(LeftClickTrigger trigger) {
         activeType = (activeType + 1) % types.length;
+
+        var context = trigger.getContext();
 
         context.getCasterEntity().sendMessage("Active particle is now " + types[activeType].getId());
 

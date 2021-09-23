@@ -3,25 +3,24 @@ package co.runed.merlin.concept.triggers;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 
-public abstract class EventParams<T extends Event> implements Params {
-    T baseEvent;
-    boolean cancelled = false;
+public class EventTrigger<T extends Event> extends BaseTrigger {
+    private T baseEvent;
 
-    public EventParams(T baseEvent) {
+    public EventTrigger(T baseEvent) {
         this.baseEvent = baseEvent;
     }
 
     public T getBaseEvent() {
         return baseEvent;
     }
-
+    
     @Override
     public void setCancelled(boolean cancelled) {
         if (baseEvent instanceof Cancellable cancellable) {
             cancellable.setCancelled(cancelled);
         }
 
-        this.cancelled = cancelled;
+        super.setCancelled(cancelled);
     }
 
     @Override
@@ -30,6 +29,6 @@ public abstract class EventParams<T extends Event> implements Params {
             return cancellable.isCancelled();
         }
 
-        return cancelled;
+        return super.isCancelled();
     }
 }

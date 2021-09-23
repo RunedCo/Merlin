@@ -15,8 +15,8 @@ import co.runed.dayroom.util.Describable;
 import co.runed.dayroom.util.Enableable;
 import co.runed.dayroom.util.Identifiable;
 import co.runed.dayroom.util.Nameable;
-import co.runed.merlin.concept.CastContext;
 import co.runed.merlin.concept.definitions.SpellProviderDefinition;
+import co.runed.merlin.concept.triggers.Trigger;
 import co.runed.merlin.core.SpellProviderType;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -105,13 +105,13 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
         return spells;
     }
 
-    public CastResult preCast(CastContext context) {
+    public CastResult preCast(Trigger trigger) {
         if (!isEnabled()) return CastResult.fail();
 
         return CastResult.success();
     }
 
-    public void postCast(CastContext context) {
+    public void postCast(Trigger trigger) {
 
     }
 

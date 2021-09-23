@@ -14,10 +14,10 @@ import co.runed.dayroom.util.Enableable;
 import co.runed.dayroom.util.Identifiable;
 import co.runed.dayroom.util.Nameable;
 import co.runed.merlin.Merlin;
-import co.runed.merlin.concept.CastContext;
 import co.runed.merlin.concept.costs.Cost;
 import co.runed.merlin.concept.spells.type.SpellType;
 import co.runed.merlin.concept.spells.type.ToggleSpellType;
+import co.runed.merlin.concept.triggers.Trigger;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -80,32 +80,32 @@ public abstract class Spell implements Identifiable, Nameable, Describable, Conf
         return parent;
     }
 
-    public CastResult preCast(CastContext context) {
+    public CastResult preCast(Trigger trigger) {
         instanceCosts.clear();
 
         if (!isInitialised() && isEnabled()) return CastResult.fail();
 
-        if (!hasOption(SpellOption.IGNORE_CANCELLED) && context.isCancelled()) return CastResult.fail();
+        if (!hasOption(SpellOption.IGNORE_CANCELLED) && trigger.isCancelled()) return CastResult.fail();
 
-        var parentResult = getParent().preCast(context);
+        var parentResult = getParent().preCast(trigger);
         if (!parentResult.isSuccess()) return parentResult;
 
         if (isOnCooldown() && !hasOption(SpellOption.IGNORE_COOLDOWN)) return CastResult.fail(Lang.key("spell." + getId() + ".msg.cooldown", "spell.msg.cooldown").with(this).toString());
 
-        var costResult = evaluateCosts(context);
+        var costResult = evaluateCosts(trigger);
         if (!costResult.isSuccess() && !hasOption(SpellOption.IGNORE_COSTS)) return costResult;
 
         return CastResult.success();
     }
 
-    public CastResult evaluateCosts(CastContext context) {
+    public CastResult evaluateCosts(Trigger trigger) {
         var fetchedCosts = new ArrayList<Cost>();
 
         for (var costSupplier : getDefinition().getCosts()) {
             var cost = costSupplier.get();
             fetchedCosts.add(cost);
 
-            var result = cost.evaluate(context);
+            var result = cost.evaluate(trigger);
 
             if (!result.isSuccess()) return result;
         }
@@ -115,18 +115,18 @@ public abstract class Spell implements Identifiable, Nameable, Describable, Conf
         return CastResult.success();
     }
 
-    public void runCosts(CastContext context) {
+    public void runCosts(Trigger trigger) {
         for (var cost : instanceCosts) {
-            cost.run(context);
+            cost.run(trigger);
         }
 
         instanceCosts.clear();
     }
 
-    public CastResult postCast(CastContext context) {
-        getParent().postCast(context);
+    public CastResult postCast(Trigger trigger) {
+        getParent().postCast(trigger);
 
-        if (!hasOption(SpellOption.IGNORE_COSTS)) runCosts(context);
+        if (!hasOption(SpellOption.IGNORE_COSTS)) runCosts(trigger);
         if (!hasOption(SpellOption.IGNORE_COOLDOWN)) setOnCooldown(true);
 
         return CastResult.success();

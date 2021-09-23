@@ -5,11 +5,11 @@ import co.runed.bolster.damage.DamageSource;
 import co.runed.bolster.game.traits.Traits;
 import co.runed.bolster.util.ComponentUtil;
 import co.runed.bolster.util.ItemBuilder;
-import co.runed.merlin.concept.CastContext;
 import co.runed.merlin.concept.spells.CastResult;
 import co.runed.merlin.concept.spells.SpellDefinition;
 import co.runed.merlin.concept.spells.SpellOption;
 import co.runed.merlin.concept.spells.SpellProvider;
+import co.runed.merlin.concept.triggers.Trigger;
 import co.runed.merlin.core.MerlinTraits;
 import co.runed.merlin.core.SpellProviderType;
 import net.kyori.adventure.text.Component;
@@ -69,18 +69,21 @@ public class ItemImpl extends SpellProvider implements DamageSource {
     }
 
     @Override
-    public CastResult preCast(CastContext context) {
+    public CastResult preCast(Trigger trigger) {
+        var context = trigger.getContext();
         var spellDef = context.getSpell().getDefinition();
         var result = itemRequirements.getOrDefault(spellDef, ItemRequirement.ALWAYS);
 
         if (!spellDef.hasOption(SpellOption.IGNORE_ITEM_REQUIREMENTS) && !result.evaluate(context)) return CastResult.fail();
 
-        return super.preCast(context);
+        return super.preCast(trigger);
     }
 
     @Override
-    public void postCast(CastContext context) {
-        super.postCast(context);
+    public void postCast(Trigger trigger) {
+        var context = trigger.getContext();
+
+        super.postCast(trigger);
 
         if (context.getSpell().hasOption(SpellOption.SHOW_COOLDOWN)) {
             // TODO SHOW ITEM COOLDOWN

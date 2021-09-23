@@ -6,7 +6,8 @@ import co.runed.merlin.concept.CastContext;
 import co.runed.merlin.concept.spells.CastResult;
 import co.runed.merlin.concept.spells.Spell;
 import co.runed.merlin.concept.spells.SpellDefinition;
-import co.runed.merlin.concept.triggers.interact.InteractParams;
+import co.runed.merlin.concept.triggers.SpellTrigger;
+import co.runed.merlin.concept.triggers.interact.InteractTrigger;
 import co.runed.merlin.concept.triggers.interact.RightClickTrigger;
 import co.runed.merlin.concept.util.AOE;
 import co.runed.merlin.concept.util.Leap;
@@ -19,7 +20,7 @@ import org.bukkit.entity.LivingEntity;
 import java.util.Collection;
 import java.util.HashSet;
 
-public class Runedash extends Spell implements RightClickTrigger {
+public class Runedash extends Spell {
     private final double upwardsVelocity = 0.5;
     private final double forwardsVelocity = 5;
     private final double damage = 20;
@@ -36,14 +37,17 @@ public class Runedash extends Spell implements RightClickTrigger {
         super.loadConfig(config);
     }
 
-    @Override
-    public CastResult onRightClick(CastContext context, InteractParams params) {
-        if (!params.isRightClick()) return CastResult.fail();
+    @SpellTrigger
+    public CastResult onRightClick(RightClickTrigger trigger) {
+        var context = trigger.getContext();
+
+        if (!trigger.isRightClick()) return CastResult.fail();
+
         var entity = context.getCaster().getEntity();
 
         var task = new RepeatingTask(2L)
                 .until(() -> false)
-                .run(() -> doTick(context, params))
+                .run(() -> doTick(trigger))
                 .onFinish(hitEntities::clear);
 
         var leap = new Leap(upwardsVelocity, forwardsVelocity)
@@ -59,7 +63,9 @@ public class Runedash extends Spell implements RightClickTrigger {
         return this.getParent().equals(context.getProvider());
     }
 
-    private void doTick(CastContext context, InteractParams params) {
+    private void doTick(InteractTrigger trigger) {
+        var context = trigger.getContext();
+
         var targets = AOE.livingEntities(context.getCaster().getLocation(), 5)
                 .ignoreIf((target) -> context.getCaster().equals(target))
                 .ignoreIf(() -> hitEntities);
