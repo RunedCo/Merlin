@@ -4,7 +4,7 @@ import co.runed.merlin.spells.CastResult;
 import co.runed.merlin.spells.Spell;
 import co.runed.merlin.spells.SpellDefinition;
 import co.runed.merlin.triggers.SpellTrigger;
-import co.runed.merlin.triggers.projectile.OnShootTrigger;
+import co.runed.merlin.triggers.projectile.ShootTrigger;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,7 +22,7 @@ public class AmmoShootSpell extends Spell {
     }
 
     @SpellTrigger
-    public CastResult onShoot(OnShootTrigger trigger) {
+    public CastResult onShoot(ShootTrigger trigger) {
         var context = trigger.getContext();
         var caster = context.getCaster().getEntity();
 

@@ -11,8 +11,8 @@ public class EntityMovementListener implements Listener {
     private void onPlayerSneak(PlayerToggleSneakEvent event) {
         var player = event.getPlayer();
 
-        var params = new OnSneakTrigger(event);
+        var params = new SneakTrigger(event);
 
-        SpellManager.getInstance().run(player, new OnSneakTrigger(event));
+        SpellManager.getInstance().run(player, new SneakTrigger(event));
     }
 }

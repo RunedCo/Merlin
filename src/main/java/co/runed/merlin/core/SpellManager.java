@@ -12,7 +12,7 @@ import co.runed.merlin.triggers.SpellTrigger;
 import co.runed.merlin.triggers.Trigger;
 import co.runed.merlin.triggers.interact.PlayerInteractListener;
 import co.runed.merlin.triggers.inventory.PlayerInventoryListener;
-import co.runed.merlin.triggers.lifecycle.OnTrigger;
+import co.runed.merlin.triggers.lifecycle.OnTriggerTrigger;
 import co.runed.merlin.triggers.lifecycle.TickTrigger;
 import co.runed.merlin.triggers.movement.EntityMovementListener;
 import co.runed.merlin.triggers.projectile.EntityProjectileListener;
@@ -255,7 +255,7 @@ public class SpellManager extends Manager {
         trigger.setContext(castContext);
 
         try {
-            if (!(trigger instanceof OnTrigger)) run(entity, new OnTrigger(trigger, method));
+            if (!(trigger instanceof OnTriggerTrigger)) run(entity, new OnTriggerTrigger(trigger, method));
 
             var result = spell.preCast(trigger);
 

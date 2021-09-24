@@ -35,7 +35,7 @@ public class EntityProjectileListener implements Listener {
     }
 
     private void onShoot(Event event, LivingEntity entity, ItemStack item, Entity projectile, float force, Vector velocity) {
-        var trigger = new OnShootTrigger(event, entity, item, projectile, force, velocity);
+        var trigger = new ShootTrigger(event, entity, item, projectile, force, velocity);
 
         SpellManager.getInstance().run(entity, trigger);
     }

@@ -8,7 +8,7 @@ import co.runed.merlin.spells.Spell;
 import co.runed.merlin.spells.SpellDefinition;
 import co.runed.merlin.triggers.SpellTrigger;
 import co.runed.merlin.triggers.interact.LeftClickTrigger;
-import co.runed.merlin.triggers.projectile.OnShootTrigger;
+import co.runed.merlin.triggers.projectile.ShootTrigger;
 import co.runed.merlin.util.Projectile;
 import co.runed.merlin.util.task.RepeatingTask;
 import net.kyori.adventure.key.Key;
@@ -28,7 +28,7 @@ public class TNTBowShoot extends Spell {
     }
 
     @SpellTrigger
-    public CastResult onShoot(OnShootTrigger trigger) {
+    public CastResult onShoot(ShootTrigger trigger) {
         var context = trigger.getContext();
         var caster = context.getCasterEntity();
         trigger.setSpawnProjectile(false);

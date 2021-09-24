@@ -6,11 +6,11 @@ import co.runed.merlin.triggers.Trigger;
 
 import java.lang.reflect.Method;
 
-public class OnTrigger extends BaseTrigger {
+public class OnTriggerTrigger extends BaseTrigger {
     Trigger trigger;
     Method method;
 
-    public OnTrigger(Trigger trigger, Method method) {
+    public OnTriggerTrigger(Trigger trigger, Method method) {
         this.trigger = trigger;
         this.method = method;
     }

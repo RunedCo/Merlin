@@ -10,7 +10,7 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-public class OnShootTrigger extends EventTrigger<Event> {
+public class ShootTrigger extends EventTrigger<Event> {
     private LivingEntity entity;
     private ItemStack itemStack;
     private Entity projectile;
@@ -18,7 +18,7 @@ public class OnShootTrigger extends EventTrigger<Event> {
     private Vector velocity;
     private boolean cancelled = false;
 
-    public OnShootTrigger(Event baseEvent, LivingEntity entity, ItemStack item, Entity projectile, float force, Vector velocity) {
+    public ShootTrigger(Event baseEvent, LivingEntity entity, ItemStack item, Entity projectile, float force, Vector velocity) {
         super(baseEvent);
 
         this.entity = entity;

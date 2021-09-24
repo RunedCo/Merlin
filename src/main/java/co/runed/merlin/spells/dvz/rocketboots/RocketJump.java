@@ -8,7 +8,7 @@ import co.runed.merlin.spells.CastResult;
 import co.runed.merlin.spells.Spell;
 import co.runed.merlin.spells.SpellDefinition;
 import co.runed.merlin.triggers.SpellTrigger;
-import co.runed.merlin.triggers.movement.OnSneakTrigger;
+import co.runed.merlin.triggers.movement.SneakTrigger;
 import co.runed.merlin.util.Leap;
 import co.runed.merlin.util.task.RepeatingTask;
 import org.bukkit.Particle;
@@ -22,7 +22,7 @@ public class RocketJump extends Spell {
     }
 
     @SpellTrigger
-    public CastResult onSneak(OnSneakTrigger trigger) {
+    public CastResult onSneak(SneakTrigger trigger) {
         var context = trigger.getContext();
         if (trigger.isSneaking()) return CastResult.skip();
 

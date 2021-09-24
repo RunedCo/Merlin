@@ -3,8 +3,8 @@ package co.runed.merlin.triggers.movement;
 import co.runed.merlin.triggers.EventTrigger;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 
-public class OnSneakTrigger extends EventTrigger<PlayerToggleSneakEvent> {
-    public OnSneakTrigger(PlayerToggleSneakEvent baseEvent) {
+public class SneakTrigger extends EventTrigger<PlayerToggleSneakEvent> {
+    public SneakTrigger(PlayerToggleSneakEvent baseEvent) {
         super(baseEvent);
     }
 
