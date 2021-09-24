@@ -36,29 +36,7 @@ public class Caster implements DamageSource {
     public Location getEyeLocation() {
         return getEntity().getEyeLocation();
     }
-
-//    public void addSpell(Spell spell) {
-//        spells.add(spell);
-//
-//        if (spell.isEnabled()) return;
-//
-//        spell.setOwner(entity);
-//        spell.setEnabled(true);
-//
-//        SpellManager.getInstance().run(getEntity(), EnableTrigger.class, EnableTrigger::onEnable);
-//    }
-//
-//    public void disableSpell(Spell spell) {
-//        spell.setEnabled(false);
-//    }
-//
-//    public void removeSpell(Spell spell) {
-//        SpellManager.getInstance().run(getEntity(), DisableTrigger.class, DisableTrigger::onDisable);
-//
-//        spells.remove(spell);
-//        spell.destroy();
-//    }
-
+    
     public boolean isHolding(ItemDefinition definition) {
         return isEquipped(definition, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
     }

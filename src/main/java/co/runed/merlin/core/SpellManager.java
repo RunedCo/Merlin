@@ -1,7 +1,7 @@
 package co.runed.merlin.core;
 
+import co.runed.bolster.events.entity.EntitySetCooldownEvent;
 import co.runed.bolster.managers.Manager;
-import co.runed.bolster.util.TimeUtil;
 import co.runed.bolster.util.lang.Lang;
 import co.runed.bolster.util.registries.Definition;
 import co.runed.dayroom.util.ReflectionUtil;
@@ -16,12 +16,14 @@ import co.runed.merlin.triggers.lifecycle.OnTrigger;
 import co.runed.merlin.triggers.lifecycle.TickTrigger;
 import co.runed.merlin.triggers.movement.EntityMovementListener;
 import co.runed.merlin.triggers.projectile.EntityProjectileListener;
-import co.runed.merlin.util.task.Task;
+import co.runed.merlin.util.task.RepeatingTask;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -33,7 +35,10 @@ public class SpellManager extends Manager {
 
     private final Map<UUID, Collection<SpellProvider>> spellProviders = new HashMap<>();
     private final Map<UUID, Collection<PassiveSpellContainer>> passives = new HashMap<>();
+    private final Collection<Spell> alertingSpells = new HashSet<>();
     private final Map<UUID, Long> lastErrorTime = new HashMap<>();
+
+    private final RepeatingTask alertTask = new RepeatingTask(5L);
 
     private Map<Class<? extends Spell>, Map<Class<? extends Trigger>, List<Method>>> spellMethods = new HashMap<>();
 
@@ -46,6 +51,8 @@ public class SpellManager extends Manager {
         Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(), Merlin.getInstance());
         Bukkit.getPluginManager().registerEvents(new EntityProjectileListener(), Merlin.getInstance());
         Bukkit.getPluginManager().registerEvents(new EntityMovementListener(), Merlin.getInstance());
+
+        alertTask.run(this::doAlertTask);
 
         _instance = this;
     }
@@ -270,14 +277,7 @@ public class SpellManager extends Manager {
             if (result.isSuccess()) {
                 result = spell.postCast(trigger);
 
-                if (spell.hasOption(SpellOption.ALERT_WHEN_READY) && spell.isOnCooldown()) {
-                    var alertTask = new Task()
-                            .delay(TimeUtil.toTicks(TimeUtil.fromSeconds(spell.getRemainingCooldown())))
-                            .run(() -> {
-                                entity.sendMessage(Lang.key("spell." + spell.getId() + ".msg.ready", "spell.msg.ready").with(spell).toComponent());
-                                entity.playSound(ALERT_READY_SOUND);
-                            });
-                }
+                scheduleReadyAlert(spell, entity);
             }
 
             return result;
@@ -287,6 +287,34 @@ public class SpellManager extends Manager {
         }
 
         return CastResult.fail();
+    }
+
+    private void scheduleReadyAlert(Spell spell, LivingEntity entity) {
+        if (spell.hasOption(SpellOption.ALERT_WHEN_READY) && spell.isOnCooldown()) {
+            alertingSpells.add(spell);
+        }
+    }
+
+    private void doAlertTask() {
+        for (var spell : new HashSet<>(alertingSpells)) {
+            var owner = spell.getOwner();
+
+            if (!spell.isOnCooldown() && owner != null) {
+                owner.sendMessage(Lang.key("spell." + spell.getId() + ".msg.ready", "spell.msg.ready").with(spell).toComponent());
+                owner.playSound(ALERT_READY_SOUND);
+
+                alertingSpells.remove(spell);
+            }
+        }
+    }
+
+    @EventHandler
+    private void onCooldownChange(EntitySetCooldownEvent event) {
+        var cooldown = event.getCooldownId();
+        var cooldownLength = event.getCooldown();
+        var entity = event.getEntity();
+
+        if (!(event instanceof Player player)) return;
     }
 
     public static SpellManager getInstance() {
