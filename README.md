@@ -43,10 +43,9 @@ public class ExampleSpell extends Spell implements InteractTrigger {
         radius = config.getDouble("radius", radius);
     }
 
-    @Override
-    public CastResult onClick(CastContext context, InteractParams params) {
-        if (!params.isRightClick()) return CastResult.skip();
-
+    @SpellTrigger
+    public CastResult onRightClick(RightClickTrigger trigger) {
+        var context = trigger.getCastContext();
         var targets = AOE.livingEntities(context.getCastLocation(), radius);
 
         for (var target : targets) {
