@@ -21,22 +21,22 @@ public class Items {
 
     /* Base Spells */
     public static SpellDefinition AMMO_SHOOT_BASE_NO_ARROW = new SpellDefinition("ammo_shoot_bow_no_arrow", AmmoShootSpell::new)
-            .priority(1000)
-            .cost(() -> new AmmoCost(1));
+            .setPriority(1000)
+            .addCost(() -> new AmmoCost(1));
 
     public static SpellDefinition AMMO_SHOOT_BASE_ARROW = new SpellDefinition("ammo_shoot_bow_arrow", (def) -> new AmmoShootSpell(def, true))
-            .priority(1000)
-            .cost(() -> new AmmoCost(1));
+            .setPriority(1000)
+            .addCost(() -> new AmmoCost(1));
 
     /* Base Items */
     private static ItemDefinition WEAPON_BASE = new ItemDefinition("weapon_base")
             .setBaseItemStack(new ItemBuilder(Material.NETHERITE_HOE))
-            .category(Category.WEAPONS, Category.LEVELABLE);
+            .addCategories(Category.WEAPONS, Category.LEVELABLE);
 
     public static ItemDefinition RANGED_WEAPON_BASE = new ItemDefinition("ranged_weapon_base")
             .from(WEAPON_BASE)
             .setBaseItemStack(new ItemBuilder(Material.BOW))
-            .category(Category.RANGED);
+            .addCategories(Category.RANGED);
 
     // TODO add cancel event on fire bow? maybe move this to be per bow
     public static ItemDefinition BOW_BASE = new ItemDefinition("bow_base")
@@ -47,9 +47,9 @@ public class Items {
     // Runeblade
     public static final SpellDefinition RUNEDASH = new SpellDefinition("runedash", Runedash::new)
             .setName("Runedash")
-            .options(SpellOption.ALERT_WHEN_READY)
-            .cooldown(10)
-            .priority(1000);
+            .addOptions(SpellOption.ALERT_WHEN_READY)
+            .setCooldown(10)
+            .setPriority(1000);
 
     public static ItemDefinition RUNEBLADE = new ItemDefinition("runeblade")
             .from(WEAPON_BASE)
@@ -98,8 +98,8 @@ public class Items {
     // BOOTS TEST
     public static SpellDefinition ROCKET_JUMP = new SpellDefinition("rocket_jump", RocketJump::new)
             .setName("Rocket Jump")
-            .options(SpellOption.ALERT_WHEN_READY)
-            .cooldown(20);
+            .addOptions(SpellOption.ALERT_WHEN_READY)
+            .setCooldown(20);
 
     public static ItemDefinition ROCKET_BOOTS = new ItemDefinition("rocket_boots")
             .setName("Rocket Boots")

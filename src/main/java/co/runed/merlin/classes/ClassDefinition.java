@@ -35,8 +35,8 @@ public class ClassDefinition extends SpellProviderDefinition<ClassImpl> {
     }
 
     @Override
-    public ClassDefinition category(Category... categories) {
-        return (ClassDefinition) super.category(categories);
+    public ClassDefinition addCategories(Category... categories) {
+        return (ClassDefinition) super.addCategories(categories);
     }
 
     @Override

@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 public class AmmoDefinition extends ItemDefinition {
     private final SpellDefinition BASE_AMMO_SPELL = new SpellDefinition("update_ammo_display", BaseAmmoSpell::new)
-            .options(SpellOption.HIDE_ERROR_MESSAGES, SpellOption.IGNORE_CANCELLED);
+            .addOptions(SpellOption.HIDE_ERROR_MESSAGES, SpellOption.IGNORE_CANCELLED);
 
     public AmmoDefinition(String id) {
         this(id, AmmoImpl::new);

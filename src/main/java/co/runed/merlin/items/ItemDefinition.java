@@ -104,8 +104,8 @@ public class ItemDefinition extends SpellProviderDefinition<ItemImpl> {
     }
 
     @Override
-    public ItemDefinition category(Category... categories) {
-        return (ItemDefinition) super.category(categories);
+    public ItemDefinition addCategories(Category... categories) {
+        return (ItemDefinition) super.addCategories(categories);
     }
 
     public ItemDefinition setAmmoDefinition(AmmoDefinition ammoDefinition) {

@@ -1,5 +1,6 @@
 package co.runed.merlin.util.task;
 
+import co.runed.bolster.util.TaskUtil;
 import co.runed.bolster.util.TimeUtil;
 import co.runed.merlin.Merlin;
 import org.bukkit.Bukkit;
@@ -44,5 +45,9 @@ public class Task {
 
     public BukkitTask getInternalTask() {
         return internalTask;
+    }
+
+    public static TaskUtil.TaskSeries series() {
+        return new TaskUtil.TaskSeries();
     }
 }

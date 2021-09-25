@@ -17,6 +17,7 @@ public class SpellDefinition extends Definition<Spell> implements Describable {
     private int charges = 1;
     private int priority = 0;
     private double cooldown = 0d;
+    private double castTime = 0;
     private final List<Supplier<Cost>> costs = new ArrayList<>();
     private final Set<SpellOption> options = new HashSet<>();
 
@@ -24,19 +25,19 @@ public class SpellDefinition extends Definition<Spell> implements Describable {
         super(id, (def) -> function.apply((SpellDefinition) def));
     }
 
-    public SpellDefinition charges(int charges) {
+    public SpellDefinition setCharges(int charges) {
         this.charges = charges;
 
         return this;
     }
 
-    public SpellDefinition cooldown(double cooldown) {
+    public SpellDefinition setCooldown(double cooldown) {
         this.cooldown = cooldown;
 
         return this;
     }
 
-    public SpellDefinition priority(int priority) {
+    public SpellDefinition setPriority(int priority) {
         this.priority = priority;
 
         return this;
@@ -46,7 +47,7 @@ public class SpellDefinition extends Definition<Spell> implements Describable {
         return priority;
     }
 
-    public SpellDefinition cost(Supplier<Cost> cost) {
+    public SpellDefinition addCost(Supplier<Cost> cost) {
         this.costs.add(cost);
 
         return this;
@@ -56,22 +57,29 @@ public class SpellDefinition extends Definition<Spell> implements Describable {
         return costs;
     }
 
+    public SpellDefinition setCastTime(double castTime) {
+        this.castTime = castTime;
+
+        return this;
+    }
+
     @Override
     public SpellDefinition from(Definition<Spell> parent) {
         super.from(parent);
 
         if (parent instanceof SpellDefinition spellDefinition) {
             for (var option : spellDefinition.options) {
-                options(option);
+                addOptions(option);
             }
 
             for (var cost : spellDefinition.costs) {
-                cost(cost);
+                addCost(cost);
             }
 
-            priority(spellDefinition.priority);
-            charges(spellDefinition.charges);
-            cooldown(spellDefinition.cooldown);
+            setPriority(spellDefinition.priority);
+            setCharges(spellDefinition.charges);
+            setCooldown(spellDefinition.cooldown);
+            setCastTime(spellDefinition.castTime);
         }
 
         return this;
@@ -83,11 +91,11 @@ public class SpellDefinition extends Definition<Spell> implements Describable {
     }
 
     @Override
-    public SpellDefinition category(Category... categories) {
-        return (SpellDefinition) super.category(categories);
+    public SpellDefinition addCategories(Category... categories) {
+        return (SpellDefinition) super.addCategories(categories);
     }
 
-    public SpellDefinition options(SpellOption... option) {
+    public SpellDefinition addOptions(SpellOption... option) {
         this.options.addAll(Arrays.asList(option));
 
         return this;
@@ -116,6 +124,7 @@ public class SpellDefinition extends Definition<Spell> implements Describable {
         output.setCooldown(cooldown);
         output.setCharges(charges);
         output.setPriority(priority);
+        output.setCastTime(castTime);
 
         output.initialise();
 

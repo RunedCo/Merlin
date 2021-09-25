@@ -4,6 +4,7 @@ import co.runed.bolster.damage.DamageInfo;
 import co.runed.bolster.damage.DamageSource;
 import co.runed.bolster.managers.CooldownManager;
 import co.runed.bolster.util.Owned;
+import co.runed.bolster.util.TaskUtil;
 import co.runed.bolster.util.config.ConfigUtil;
 import co.runed.bolster.util.config.Configurable;
 import co.runed.bolster.util.cooldown.CooldownSource;
@@ -41,6 +42,10 @@ public abstract class Spell implements Identifiable, Nameable, Describable, Conf
     private SpellType spellType;
     private boolean toggled = false;
 
+    private double castTime = 0;
+    private boolean casting = false;
+    private TaskUtil.TaskSeries castingTask = null;
+
     private LivingEntity owner;
     private SpellProvider parent;
     private List<Cost> instanceCosts = new ArrayList<>();
@@ -68,6 +73,19 @@ public abstract class Spell implements Identifiable, Nameable, Describable, Conf
         this.initialised = true;
     }
 
+    public boolean isCasting() {
+        return casting;
+    }
+
+    public void setCasting(boolean casting) {
+        this.casting = casting;
+    }
+
+    public void cancel() {
+        setCasting(false);
+        if (castingTask != null) castingTask.cancel();
+    }
+
     public SpellDefinition getDefinition() {
         return definition;
     }
@@ -84,6 +102,7 @@ public abstract class Spell implements Identifiable, Nameable, Describable, Conf
         instanceCosts.clear();
 
         if (!isInitialised() && isEnabled()) return CastResult.fail();
+        if (isCasting()) return CastResult.fail();
 
         if (!hasOption(SpellOption.IGNORE_CANCELLED) && trigger.isCancelled()) return CastResult.fail();
 
@@ -173,6 +192,22 @@ public abstract class Spell implements Identifiable, Nameable, Describable, Conf
 
     public void setCharges(int charges) {
         this.charges = charges;
+    }
+
+    public void setCastTime(double castTime) {
+        this.castTime = castTime;
+    }
+
+    public double getCastTime() {
+        return castTime;
+    }
+
+    public void setCastingTask(TaskUtil.TaskSeries castingTask) {
+        this.castingTask = castingTask;
+    }
+
+    public TaskUtil.TaskSeries getCastingTask() {
+        return castingTask;
     }
 
     public boolean hasOption(SpellOption option) {
