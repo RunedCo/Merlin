@@ -1,4 +1,4 @@
-package co.runed.merlin.triggers.lifecycle;
+package co.runed.merlin.triggers.core;
 
 import co.runed.merlin.core.CastContext;
 import co.runed.merlin.triggers.BaseTrigger;

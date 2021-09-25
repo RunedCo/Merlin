@@ -97,6 +97,8 @@ public class Items {
 
     // BOOTS TEST
     public static SpellDefinition ROCKET_JUMP = new SpellDefinition("rocket_jump", RocketJump::new)
+            .setName("Rocket Jump")
+            .options(SpellOption.ALERT_WHEN_READY)
             .cooldown(20);
 
     public static ItemDefinition ROCKET_BOOTS = new ItemDefinition("rocket_boots")

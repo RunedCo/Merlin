@@ -8,10 +8,10 @@ import co.runed.merlin.Merlin;
 import co.runed.merlin.core.MerlinRegistries;
 import co.runed.merlin.core.SpellManager;
 import co.runed.merlin.spells.SpellProviderDefinition;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityPickupItemEvent;
@@ -26,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class ItemManager extends Manager {
@@ -196,6 +197,17 @@ public class ItemManager extends Manager {
         return allStacks.get(0);
     }
 
+    public boolean areStacksEqual(ItemStack stack1, ItemStack stack2) {
+        if (stack1 == stack2) return true;
+        if (stack1 == null || stack2 == null) return false;
+
+        var stack1Id = getIdFromStack(stack1);
+
+        if (stack1Id != null && stack1Id.equals(getIdFromStack(stack2))) return true;
+
+        return stack1.equals(stack2);
+    }
+
     public void clearItem(LivingEntity entity, Definition<ItemImpl> itemDef) {
         SpellManager.getInstance().removeProvider(entity, itemDef);
     }
@@ -224,22 +236,24 @@ public class ItemManager extends Manager {
 
     @EventHandler(priority = EventPriority.MONITOR)
     private void onPlayerJoin(PlayerJoinEvent event) {
-        rebuildOnJoin(event.getPlayer());
+        rebuildOnJoin(event.getPlayer().getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     private void onLoadPlayer(LoadPlayerDataEvent event) {
-        rebuildOnJoin(event.getPlayer());
+        rebuildOnJoin(event.getPlayerData().getUuid());
     }
 
-    private void rebuildOnJoin(Player player) {
+    private void rebuildOnJoin(UUID uuid) {
+        var player = Bukkit.getPlayer(uuid);
+
         if (player == null) return;
 
         for (var inventory : BolsterEntity.from(player).getInventories()) {
             for (var itemStack : inventory) {
                 var itemDef = ItemDefinition.from(itemStack);
 
-                if (itemDef == null) return;
+                if (itemDef == null) continue;
 
                 getOrCreate(player, itemDef);
             }

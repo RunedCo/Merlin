@@ -10,12 +10,22 @@ import co.runed.merlin.spells.*;
 import co.runed.merlin.spells.type.RepeatingSpellType;
 import co.runed.merlin.triggers.SpellTrigger;
 import co.runed.merlin.triggers.Trigger;
+import co.runed.merlin.triggers.core.OnTriggerTrigger;
+import co.runed.merlin.triggers.core.TickTrigger;
+import co.runed.merlin.triggers.damage.EntityDamageListener;
+import co.runed.merlin.triggers.effects.EntityStatusEffectListener;
+import co.runed.merlin.triggers.interact.PlayerInteractAtEntityListener;
 import co.runed.merlin.triggers.interact.PlayerInteractListener;
+import co.runed.merlin.triggers.inventory.EntityArmorEquipListener;
 import co.runed.merlin.triggers.inventory.PlayerInventoryListener;
-import co.runed.merlin.triggers.lifecycle.OnTriggerTrigger;
-import co.runed.merlin.triggers.lifecycle.TickTrigger;
+import co.runed.merlin.triggers.item.PlayerEatListener;
+import co.runed.merlin.triggers.item.PlayerFishListener;
+import co.runed.merlin.triggers.lifecycle.EntitySpawnListener;
+import co.runed.merlin.triggers.lifecycle.PlayerConnectListener;
 import co.runed.merlin.triggers.movement.EntityMovementListener;
+import co.runed.merlin.triggers.movement.PlayerPortalListener;
 import co.runed.merlin.triggers.projectile.EntityProjectileListener;
+import co.runed.merlin.triggers.world.PlayerBreakBlockListener;
 import co.runed.merlin.util.task.RepeatingTask;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
@@ -49,8 +59,19 @@ public class SpellManager extends Manager {
 
         Bukkit.getPluginManager().registerEvents(new PlayerInventoryListener(), Merlin.getInstance());
         Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(), Merlin.getInstance());
+        Bukkit.getPluginManager().registerEvents(new PlayerConnectListener(), Merlin.getInstance());
+        Bukkit.getPluginManager().registerEvents(new PlayerEatListener(), Merlin.getInstance());
+        Bukkit.getPluginManager().registerEvents(new PlayerPortalListener(), Merlin.getInstance());
+        Bukkit.getPluginManager().registerEvents(new PlayerFishListener(), Merlin.getInstance());
+        Bukkit.getPluginManager().registerEvents(new PlayerInteractAtEntityListener(), Merlin.getInstance());
+        Bukkit.getPluginManager().registerEvents(new PlayerBreakBlockListener(), Merlin.getInstance());
+
         Bukkit.getPluginManager().registerEvents(new EntityProjectileListener(), Merlin.getInstance());
         Bukkit.getPluginManager().registerEvents(new EntityMovementListener(), Merlin.getInstance());
+        Bukkit.getPluginManager().registerEvents(new EntityArmorEquipListener(), Merlin.getInstance());
+        Bukkit.getPluginManager().registerEvents(new EntitySpawnListener(), Merlin.getInstance());
+        Bukkit.getPluginManager().registerEvents(new EntityDamageListener(), Merlin.getInstance());
+        Bukkit.getPluginManager().registerEvents(new EntityStatusEffectListener(), Merlin.getInstance());
 
         alertTask.run(this::doAlertTask);
 
@@ -76,9 +97,6 @@ public class SpellManager extends Manager {
         passives.putIfAbsent(uuid, new HashSet<>());
 
         var providers = spellProviders.get(uuid);
-
-        // TODO check if provider is solo (e.g class) and disable others of same type if true
-
         var providerType = provider.getType();
 
         if (providerType.isSolo()) {
@@ -189,7 +207,7 @@ public class SpellManager extends Manager {
         for (var provider : entityProviders) {
             if (provider.getDefinition() == definition) {
 
-                provider.setOwner(entity);
+                if (provider.getOwner() != entity) provider.setOwner(entity);
                 return provider;
             }
         }
@@ -232,6 +250,10 @@ public class SpellManager extends Manager {
         }
 
         return spells;
+    }
+
+    public void run(Trigger trigger) {
+        Bukkit.getOnlinePlayers().forEach(p -> run(p, trigger));
     }
 
     public void run(LivingEntity entity, Trigger trigger) {

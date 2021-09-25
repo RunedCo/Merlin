@@ -1,7 +1,7 @@
 package co.runed.merlin.spells;
 
 import co.runed.merlin.triggers.SpellTrigger;
-import co.runed.merlin.triggers.lifecycle.TickTrigger;
+import co.runed.merlin.triggers.core.TickTrigger;
 import org.jetbrains.annotations.NotNull;
 
 public class TickTest extends Spell {
