@@ -2,15 +2,17 @@ package co.runed.merlin.spells;
 
 import co.runed.bolster.damage.DamageInfo;
 import co.runed.bolster.damage.DamageType;
+import co.runed.bolster.util.config.ConfigEntry;
 import co.runed.merlin.triggers.SpellTrigger;
 import co.runed.merlin.triggers.damage.DamageTrigger;
 import co.runed.merlin.util.AOE;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class AOEDamage extends Spell {
+    @ConfigEntry("radius")
     private double radius = 1;
+    @ConfigEntry("damage")
     private double damage;
 
     public AOEDamage(@NotNull SpellDefinition definition, double radius) {
@@ -21,13 +23,6 @@ public class AOEDamage extends Spell {
 
     public AOEDamage(@NotNull SpellDefinition definition) {
         super(definition);
-    }
-
-    @Override
-    public void loadConfig(ConfigurationSection config) {
-        super.loadConfig(config);
-
-        radius = config.getDouble("radius", radius);
     }
 
     @SpellTrigger

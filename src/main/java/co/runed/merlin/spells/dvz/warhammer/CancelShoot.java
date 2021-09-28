@@ -14,9 +14,8 @@ public class CancelShoot extends Spell {
 
     @SpellTrigger
     public CastResult onShoot(ShootTrigger trigger) {
-        trigger.setCancelled(true);
         trigger.setConsumeItem(false);
-        trigger.setSpawnProjectile(false);
+        trigger.setCancelled(true);
 
         return CastResult.success();
     }

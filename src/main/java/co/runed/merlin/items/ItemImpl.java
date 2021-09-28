@@ -5,6 +5,7 @@ import co.runed.bolster.damage.DamageSource;
 import co.runed.bolster.game.traits.Traits;
 import co.runed.bolster.util.ComponentUtil;
 import co.runed.bolster.util.ItemBuilder;
+import co.runed.bolster.util.config.ConfigEntry;
 import co.runed.merlin.core.MerlinTraits;
 import co.runed.merlin.core.SpellProviderType;
 import co.runed.merlin.spells.CastResult;
@@ -38,6 +39,7 @@ public class ItemImpl extends SpellProvider implements DamageSource {
 
     private final Map<SpellDefinition, ItemRequirement> itemRequirements = new HashMap<>();
 
+    @ConfigEntry("droppable")
     private boolean droppable = false;
 
     public ItemImpl(ItemDefinition definition) {
@@ -53,9 +55,6 @@ public class ItemImpl extends SpellProvider implements DamageSource {
         setTrait(MerlinTraits.ATTACK_SPEED, config.getDouble(ATTACK_SPEED_KEY, 0));
         setTrait(MerlinTraits.KNOCKBACK_RESISTANCE, config.getDouble(KNOCKBACK_RESISTANCE_KEY, 0));
         setTrait(MerlinTraits.KNOCKBACK, config.getDouble(KNOCKBACK_KEY, 0));
-
-        /* Properties */
-        setDroppable(config.getBoolean(DROPPABLE_KEY, droppable));
 
         rebuild();
     }

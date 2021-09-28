@@ -1,5 +1,6 @@
 package co.runed.merlin.spells;
 
+import co.runed.bolster.Bolster;
 import co.runed.bolster.damage.DamageSource;
 import co.runed.bolster.entity.BolsterEntity;
 import co.runed.bolster.game.traits.TraitProvider;
@@ -7,6 +8,7 @@ import co.runed.bolster.game.traits.Traits;
 import co.runed.bolster.managers.PlayerManager;
 import co.runed.bolster.util.IconPreview;
 import co.runed.bolster.util.Owned;
+import co.runed.bolster.util.config.ConfigEntry;
 import co.runed.bolster.util.config.ConfigUtil;
 import co.runed.bolster.util.config.Configurable;
 import co.runed.bolster.util.lang.Lang;
@@ -30,14 +32,18 @@ import java.util.*;
 public abstract class SpellProvider extends TraitProvider implements Identifiable, Nameable, Describable, Configurable, Owned, Enableable, DamageSource, IconPreview, LangProvider {
     public static final String CONFIG_KEY_HEALTH = "health";
 
+    @ConfigEntry("enabled")
     private boolean enabled = false;
+    @ConfigEntry("name")
+    private String name;
+    @ConfigEntry("description")
+    private String description;
+
     private final SpellProviderDefinition<?> definition;
     private LivingEntity entity;
     private final List<Spell> spells = new ArrayList<>();
     private int level = -1;
     private int temporaryLevel = -1;
-    private String name;
-    private String description;
     private AttributeModifier maxHealthModifier;
     private Map<String, String> langSource = new HashMap<>();
     private final Map<String, String> langReplacements = new HashMap<>();
@@ -85,7 +91,7 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
 
     @Override
     public void setEnabled(boolean enabled) {
-        System.out.println("Provider " + getId() + " enabled=" + enabled + " owner=" + getOwner());
+        Bolster.debug("Provider " + getId() + " enabled=" + enabled + " owner=" + getOwner());
 
         if (isEnabled() != enabled && getOwner() != null) {
             // On Disable
@@ -133,10 +139,9 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
     /* Config */
     @Override
     public void loadConfig(ConfigurationSection config) {
+        ConfigUtil.loadAnnotatedConfig(config, this);
         ConfigUtil.parseVariables(config);
 
-        description = config.getString("description", description);
-        name = config.getString("name", name);
         setTrait(Traits.MAX_HEALTH, config.getDouble(CONFIG_KEY_HEALTH, getTrait(Traits.MAX_HEALTH)));
 
         var langConfig = ConfigUtil.create();

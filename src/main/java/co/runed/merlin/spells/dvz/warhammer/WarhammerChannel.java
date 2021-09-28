@@ -6,9 +6,15 @@ import co.runed.merlin.spells.SpellDefinition;
 import co.runed.merlin.triggers.SpellTrigger;
 import co.runed.merlin.triggers.Trigger;
 import co.runed.merlin.triggers.core.TickTrigger;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.sound.SoundStop;
 import org.jetbrains.annotations.NotNull;
 
 public class WarhammerChannel extends Spell {
+    public static final Key WARHAMMER_CHARGE_KEY = Key.key("warhammercharge");
+    public static final Sound WARHAMMER_CHARGE = Sound.sound(WARHAMMER_CHARGE_KEY, Sound.Source.PLAYER, 1, 1);
+
     public WarhammerChannel(@NotNull SpellDefinition definition) {
         super(definition);
     }
@@ -19,12 +25,22 @@ public class WarhammerChannel extends Spell {
 
         if (!trigger.getContext().getCaster().isDrawingBow()) return CastResult.skip();
 
+        if (result.isSuccess()) {
+            trigger.getContext().getCasterEntity().playSound(WARHAMMER_CHARGE);
+        }
+
         return result;
     }
 
     @SpellTrigger
     public CastResult onTick(TickTrigger trigger) {
-
         return CastResult.success();
+    }
+
+    @Override
+    public void cancel() {
+        super.cancel();
+
+        if (getOwner() != null) getOwner().stopSound(SoundStop.named(WARHAMMER_CHARGE_KEY));
     }
 }

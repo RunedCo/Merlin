@@ -163,6 +163,8 @@ public class SpellManager extends Manager {
 
                 methodMap.putIfAbsent((Class<? extends Trigger>) param, new ArrayList<>());
 
+                method.setAccessible(true);
+
                 var methodList = methodMap.get(param);
 
                 methodList.add(method);

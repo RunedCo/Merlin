@@ -3,6 +3,7 @@ package co.runed.merlin.triggers;
 import co.runed.merlin.items.ItemDefinition;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractItemEventTrigger<T extends Event> extends EventTrigger<T> {
     private final ItemStack itemStack;
@@ -17,8 +18,7 @@ public abstract class AbstractItemEventTrigger<T extends Event> extends EventTri
         return itemStack;
     }
 
-    public boolean isItem(ItemDefinition item) {
-        return true;
+    public boolean isItem(@NotNull ItemDefinition item) {
+        return item.equals(ItemDefinition.from(getItemStack()));
     }
-
 }

@@ -1,6 +1,7 @@
 package co.runed.merlin.spells.dvz.warhammer;
 
 import co.runed.bolster.util.StringUtil;
+import co.runed.bolster.util.config.ConfigEntry;
 import co.runed.dayroom.properties.Property;
 import co.runed.merlin.core.MerlinTraits;
 import co.runed.merlin.spells.CastResult;
@@ -11,7 +12,6 @@ import co.runed.merlin.triggers.damage.KillEntityTrigger;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,25 +21,22 @@ public class WarhammerLevelUp extends Spell {
 
     public static final Sound RANK_UP_SOUND = Sound.sound(Key.key("warhammerrankup"), Sound.Source.PLAYER, 1, 1);
 
+    @ConfigEntry("required-kills")
     private int levelUpRequiredKills = 1;
+
+    @ConfigEntry("max-level")
     private int levelUpMaxLevel = 11;
+
+    @ConfigEntry("kill-armor-increase")
     private int killArmorIncrease = 1;
+
+    @ConfigEntry("kill-armor-increase-enabled")
     private boolean killArmorIncreaseEnabled = false;
 
     private int previousRank = 0;
 
     public WarhammerLevelUp(@NotNull SpellDefinition definition) {
         super(definition);
-    }
-
-    @Override
-    public void loadConfig(ConfigurationSection config) {
-        super.loadConfig(config);
-
-        levelUpRequiredKills = config.getInt("required-kills", levelUpRequiredKills);
-        levelUpMaxLevel = config.getInt("max-level", levelUpMaxLevel);
-        killArmorIncrease = config.getInt("kill-armor-increase", killArmorIncrease);
-        killArmorIncreaseEnabled = config.getBoolean("kill-armor-increase-enabled", killArmorIncreaseEnabled);
     }
 
     @SpellTrigger

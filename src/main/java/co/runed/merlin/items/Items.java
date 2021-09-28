@@ -16,6 +16,7 @@ import co.runed.merlin.spells.dvz.runeblade.Runedash;
 import co.runed.merlin.spells.dvz.wand.WandBlast;
 import co.runed.merlin.spells.dvz.warhammer.CancelShoot;
 import co.runed.merlin.spells.dvz.warhammer.WarhammerChannel;
+import co.runed.merlin.spells.dvz.warhammer.WarhammerConstantPassive;
 import co.runed.merlin.spells.dvz.warhammer.WarhammerLevelUp;
 import co.runed.merlin.spells.type.RepeatingSpellType;
 import org.bukkit.Material;
@@ -94,6 +95,7 @@ public class Items {
     // WARHAMMER
     public static SpellDefinition WARHAMMER_AOE = new SpellDefinition("warhammer_aoe", def -> new AOEDamage(def, 2));
     public static SpellDefinition WARHAMMER_LEVEL_UP = new SpellDefinition("warhammer_level_up", WarhammerLevelUp::new);
+    public static SpellDefinition WARHAMMER_ARROW = new SpellDefinition("warhammer_arrow", WarhammerConstantPassive::new);
     public static SpellDefinition WARHAMMER_CHANNEL = new SpellDefinition("warhammer_channel", WarhammerChannel::new)
             .addOptions(SpellOption.CANCEL_ON_SHOOT_BOW, SpellOption.CANCEL_ON_SWING)
             .setCastTime(1);
@@ -107,6 +109,7 @@ public class Items {
 
             .addSpell(WARHAMMER_AOE, ItemRequirement.MAIN_HAND)
             .addSpell(WARHAMMER_LEVEL_UP, ItemRequirement.MAIN_HAND)
+            .addSpell(WARHAMMER_ARROW, ItemRequirement.ALWAYS)
             .addSpell(WARHAMMER_CHANNEL, new RepeatingSpellType(1L), ItemRequirement.MAIN_HAND)
             .register();
 

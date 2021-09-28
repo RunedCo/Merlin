@@ -4,6 +4,7 @@ import co.runed.merlin.triggers.EventTrigger;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.entity.EntityShootBowEvent;
@@ -61,6 +62,10 @@ public class ShootTrigger extends EventTrigger<Event> {
     public void setConsumeItem(boolean consumeItem) {
         if (getBaseEvent() instanceof EntityShootBowEvent event) {
             event.setConsumeItem(consumeItem);
+
+            if (entity instanceof Player player) {
+                player.updateInventory();
+            }
         }
     }
 

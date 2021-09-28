@@ -5,6 +5,7 @@ import co.runed.bolster.damage.DamageSource;
 import co.runed.bolster.managers.CooldownManager;
 import co.runed.bolster.util.Owned;
 import co.runed.bolster.util.TaskUtil;
+import co.runed.bolster.util.config.ConfigEntry;
 import co.runed.bolster.util.config.ConfigUtil;
 import co.runed.bolster.util.config.Configurable;
 import co.runed.bolster.util.cooldown.CooldownSource;
@@ -32,17 +33,22 @@ import java.util.Map;
 public abstract class Spell implements Identifiable, Nameable, Describable, Configurable, Owned, DamageSource, Enableable, CooldownSource<Spell>, LangProvider {
     private final SpellDefinition definition;
 
+    @ConfigEntry("enabled")
     private boolean enabled = true;
-    private boolean initialised = false;
-    private String cooldownId = null;
-
+    @ConfigEntry("cooldown")
     private double cooldown = 0;
+    @ConfigEntry("charges")
     private int charges = 1;
+    @ConfigEntry("priority")
     private int priority = 1;
+    @ConfigEntry("shared-cooldown-id")
+    private String cooldownId = null;
+    @ConfigEntry("cast-time")
+    private double castTime = 0;
+
+    private boolean initialised = false;
     private SpellType spellType;
     private boolean toggled = false;
-
-    private double castTime = 0;
     private boolean casting = false;
     private TaskUtil.TaskSeries castingTask = null;
 
@@ -284,15 +290,15 @@ public abstract class Spell implements Identifiable, Nameable, Describable, Conf
 
     @Override
     public void loadConfig(ConfigurationSection config) {
-        enabled = config.getBoolean("enabled", enabled);
-        cooldown = config.getDouble("cooldown", cooldown);
-        cooldownId = config.getString("shared-cooldown-id", cooldownId);
+        ConfigUtil.loadAnnotatedConfig(config, this);
     }
 
     /* Cooldowns */
     @Override
     public Spell cooldown(double cooldown) {
-        return null;
+        setCooldown(cooldown);
+
+        return this;
     }
 
     @Override

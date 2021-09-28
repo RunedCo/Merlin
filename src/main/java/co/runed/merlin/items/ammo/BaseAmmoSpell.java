@@ -21,13 +21,18 @@ public class BaseAmmoSpell extends Spell {
         var stack = trigger.getItemStack();
         var parent = getParent();
         var stackDef = ItemManager.getInstance().getDefFrom(stack);
+        var enabled = false;
 
         if (stackDef instanceof ItemDefinition itemDefinition && itemDefinition.hasAmmo()) {
             var ammoDef = itemDefinition.getAmmoDefinition();
 
             if (parent instanceof AmmoImpl ammo) {
-                ammo.setDisplayEnabled(ammo.getDefinition().equals(ammoDef));
+                enabled = ammo.getDefinition().equals(ammoDef);
             }
+        }
+
+        if (parent instanceof AmmoImpl ammo) {
+            ammo.setDisplayEnabled(enabled);
         }
 
         return CastResult.success();
