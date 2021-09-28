@@ -11,6 +11,8 @@ import co.runed.bolster.util.config.ConfigUtil;
 import co.runed.bolster.util.config.Configurable;
 import co.runed.bolster.util.lang.Lang;
 import co.runed.bolster.util.lang.LangProvider;
+import co.runed.dayroom.properties.Properties;
+import co.runed.dayroom.properties.Property;
 import co.runed.dayroom.util.Describable;
 import co.runed.dayroom.util.Enableable;
 import co.runed.dayroom.util.Identifiable;
@@ -38,11 +40,44 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
     private String description;
     private AttributeModifier maxHealthModifier;
     private Map<String, String> langSource = new HashMap<>();
+    private final Map<String, String> langReplacements = new HashMap<>();
+
+    private final Properties properties = new Properties();
 
     public SpellProvider(SpellProviderDefinition<?> definition) {
         this.definition = definition;
     }
 
+    public SpellProviderDefinition<?> getDefinition() {
+        return definition;
+    }
+
+    public abstract SpellProviderType getType();
+
+    @Override
+    public String getId() {
+        return getDefinition().getId();
+    }
+
+    @Override
+    public String getName() {
+        return new Lang(getType().getId() + "." + getId() + ".name").withDefault(name).with(this).toLegacyString();
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /* Lifecycle */
     @Override
     public boolean isEnabled() {
         return enabled;
@@ -95,25 +130,7 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
         }
     }
 
-    public void addSpell(Spell spell) {
-        spell.setParent(this);
-        spells.add(spell);
-    }
-
-    public List<Spell> getSpells() {
-        return spells;
-    }
-
-    public CastResult preCast(Trigger trigger) {
-        if (!isEnabled()) return CastResult.fail();
-
-        return CastResult.success();
-    }
-
-    public void postCast(Trigger trigger) {
-
-    }
-
+    /* Config */
     @Override
     public void loadConfig(ConfigurationSection config) {
         ConfigUtil.parseVariables(config);
@@ -142,32 +159,35 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
         }
     }
 
-    @Override
-    public String getId() {
-        return getDefinition().getId();
+
+    /* Spells */
+    public void addSpell(Spell spell) {
+        spell.setParent(this);
+        spells.add(spell);
     }
 
-    @Override
-    public String getName() {
-        return new Lang(getType().getId() + "." + getId() + ".name").withDefault(name).with(this).toLegacyString();
+    public List<Spell> getSpells() {
+        return spells;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public CastResult preCast(Trigger trigger) {
+        if (!isEnabled()) return CastResult.fail();
+
+        return CastResult.success();
     }
 
-    @Override
-    public String getDescription() {
-        return description;
+    public void postCast(Trigger trigger) {
+
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
+    /* Language */
     @Override
     public Map<String, String> getLangReplacements() {
-        return new HashMap<>();
+        return langReplacements;
+    }
+
+    public void setLangReplacement(String key, String value) {
+        getLangReplacements().put(key, value);
     }
 
     @Override
@@ -175,6 +195,7 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
         return langSource;
     }
 
+    /* Ownership */
     @Override
     public LivingEntity getOwner() {
         return entity;
@@ -205,10 +226,7 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
         }
     }
 
-    public SpellProviderDefinition<?> getDefinition() {
-        return definition;
-    }
-
+    /* Levelling */
     public void setLevel(int level) {
         this.setLevel(level, false);
     }
@@ -246,7 +264,30 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
         return temporaryLevel > -1 ? temporaryLevel : level;
     }
 
-    public abstract SpellProviderType getType();
+    /* Properties */
+    public Properties getProperties() {
+        return properties;
+    }
+
+    /**
+     * Gets a property valye
+     *
+     * @param key the key
+     * @return the property value
+     */
+    public <T> T getProperty(Property<T> key) {
+        return getProperties().get(key);
+    }
+
+    /**
+     * Sets a property valye
+     *
+     * @param key   the key
+     * @param value the value
+     */
+    public <T> void setProperty(Property<T> key, T value) {
+        getProperties().set(key, value);
+    }
 
     public void destroy() {
         setOwner(null);

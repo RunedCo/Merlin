@@ -2,3 +2,5 @@ spell:
   msg:
     cooldown: "<red>%spell% is on cooldown (%cooldown-r% seconds remaining)</red>"
     ready: "<green>%spell% is ready!</green>"
+
+item.warhammer.name: "Warhammer%warhammer-rank%"

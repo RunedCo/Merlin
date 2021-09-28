@@ -60,6 +60,11 @@ public class ClassDefinition extends SpellProviderDefinition<ClassImpl> {
     }
 
     @Override
+    public ClassDefinition setName(String name) {
+        return (ClassDefinition) super.setName(name);
+    }
+
+    @Override
     public ClassDefinition from(Definition<ClassImpl> parent) {
         var from = (ClassDefinition) super.from(parent);
 

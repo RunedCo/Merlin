@@ -2,9 +2,11 @@ package co.runed.merlin.core;
 
 import co.runed.bolster.damage.DamageSource;
 import co.runed.bolster.entity.BolsterEntity;
+import co.runed.bolster.wip.BowTracker;
 import co.runed.merlin.items.ItemDefinition;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 
 import java.util.EnumSet;
@@ -36,7 +38,13 @@ public class Caster implements DamageSource {
     public Location getEyeLocation() {
         return getEntity().getEyeLocation();
     }
-    
+
+    public boolean isDrawingBow() {
+        if (!(getEntity() instanceof Player player)) return false;
+
+        return BowTracker.getInstance().isDrawingBow(player);
+    }
+
     public boolean isHolding(ItemDefinition definition) {
         return isEquipped(definition, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
     }

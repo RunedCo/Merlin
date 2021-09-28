@@ -12,5 +12,7 @@ public enum SpellOption {
     CANCEL_BY_MOVEMENT,
     CANCEL_BY_DEALING_DAMAGE,
     CANCEL_BY_TAKING_DAMAGE,
+    CANCEL_ON_SHOOT_BOW,                // Cancels casting when shooting
+    CANCEL_ON_SWING,                // Cancels casting when swinging an item
     RESET_COOLDOWN_ON_DEATH
 }

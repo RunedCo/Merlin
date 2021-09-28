@@ -5,6 +5,7 @@ import co.runed.bolster.util.Category;
 import co.runed.bolster.util.ItemBuilder;
 import co.runed.merlin.costs.AmmoCost;
 import co.runed.merlin.items.ammo.AmmoDefinition;
+import co.runed.merlin.spells.AOEDamage;
 import co.runed.merlin.spells.SpellDefinition;
 import co.runed.merlin.spells.SpellOption;
 import co.runed.merlin.spells.TickTest;
@@ -13,6 +14,10 @@ import co.runed.merlin.spells.dvz.longbow.TNTBowShoot;
 import co.runed.merlin.spells.dvz.rocketboots.RocketJump;
 import co.runed.merlin.spells.dvz.runeblade.Runedash;
 import co.runed.merlin.spells.dvz.wand.WandBlast;
+import co.runed.merlin.spells.dvz.warhammer.CancelShoot;
+import co.runed.merlin.spells.dvz.warhammer.WarhammerChannel;
+import co.runed.merlin.spells.dvz.warhammer.WarhammerLevelUp;
+import co.runed.merlin.spells.type.RepeatingSpellType;
 import org.bukkit.Material;
 
 public class Items {
@@ -84,6 +89,25 @@ public class Items {
             .addSpell(ON_SHOOT_LONGBOW, ItemRequirement.MAIN_HAND)
             .setAmmoDefinition(RANGER_ARROW)
             .setMaxAmmo(20)
+            .register();
+
+    // WARHAMMER
+    public static SpellDefinition WARHAMMER_AOE = new SpellDefinition("warhammer_aoe", def -> new AOEDamage(def, 2));
+    public static SpellDefinition WARHAMMER_LEVEL_UP = new SpellDefinition("warhammer_level_up", WarhammerLevelUp::new);
+    public static SpellDefinition WARHAMMER_CHANNEL = new SpellDefinition("warhammer_channel", WarhammerChannel::new)
+            .addOptions(SpellOption.CANCEL_ON_SHOOT_BOW, SpellOption.CANCEL_ON_SWING)
+            .setCastTime(1);
+
+    public static SpellDefinition CANCEL_SHOOT = new SpellDefinition("cancel_shoot", CancelShoot::new);
+
+    public static ItemDefinition WARHAMMER = new ItemDefinition("warhammer")
+            .setName("Warhammer")
+            .setBaseItemStack(new ItemBuilder(Material.BOW).setCustomModelData(2))
+            .addSpell(CANCEL_SHOOT, ItemRequirement.MAIN_HAND)
+
+            .addSpell(WARHAMMER_AOE, ItemRequirement.MAIN_HAND)
+            .addSpell(WARHAMMER_LEVEL_UP, ItemRequirement.MAIN_HAND)
+            .addSpell(WARHAMMER_CHANNEL, new RepeatingSpellType(1L), ItemRequirement.MAIN_HAND)
             .register();
 
     // WAND TEST

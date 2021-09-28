@@ -1,10 +1,12 @@
 package co.runed.merlin.core;
 
+import co.runed.bolster.Bolster;
 import co.runed.bolster.managers.CooldownManager;
 import co.runed.bolster.managers.Manager;
 import co.runed.bolster.util.BukkitUtil;
 import co.runed.bolster.util.lang.Lang;
 import co.runed.bolster.util.registries.Definition;
+import co.runed.bolster.wip.BowTracker;
 import co.runed.dayroom.util.ReflectionUtil;
 import co.runed.merlin.Merlin;
 import co.runed.merlin.spells.*;
@@ -37,9 +39,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
@@ -65,6 +69,8 @@ public class SpellManager extends Manager {
 
     public SpellManager(Plugin plugin) {
         super(plugin);
+
+        BowTracker.getInstance().addOnCancelShoot(this::onShoot);
 
         Bukkit.getPluginManager().registerEvents(new PlayerInventoryListener(), Merlin.getInstance());
         Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(), Merlin.getInstance());
@@ -400,7 +406,40 @@ public class SpellManager extends Manager {
             if (!spell.isCasting()) continue;
 
             if (spell.hasOption(SpellOption.CANCEL_BY_TAKING_DAMAGE)) {
-                System.out.println("Cancelled " + spell.getId() + " for " + spell.getOwner().getName() + " reason: take damage");
+                Bolster.debug("Cancelled " + spell.getId() + " for " + spell.getOwner().getName() + " reason: take damage");
+
+                spell.cancel();
+            }
+        }
+    }
+
+    private void onShoot(LivingEntity entity) {
+        for (var spell : this.getSpells(entity)) {
+            if (!entity.getUniqueId().equals(spell.getOwner().getUniqueId())) continue;
+            if (!spell.isCasting()) continue;
+
+            if (spell.hasOption(SpellOption.CANCEL_ON_SHOOT_BOW)) {
+                Bolster.debug("Cancelled " + spell.getId() + " for " + spell.getOwner().getName() + " reason: shoot bow");
+
+                spell.cancel();
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    private void onSwing(PlayerInteractEvent event) {
+        var entity = event.getPlayer();
+
+        if (event.getAction() != Action.LEFT_CLICK_AIR && event.getAction() != Action.LEFT_CLICK_BLOCK) {
+            return;
+        }
+
+        for (var spell : this.getSpells(entity)) {
+            if (!entity.getUniqueId().equals(spell.getOwner().getUniqueId())) continue;
+            if (!spell.isCasting()) continue;
+
+            if (spell.hasOption(SpellOption.CANCEL_ON_SWING)) {
+                Bolster.debug("Cancelled " + spell.getId() + " for " + spell.getOwner().getName() + " reason: swing item");
 
                 spell.cancel();
             }
@@ -413,7 +452,7 @@ public class SpellManager extends Manager {
 
         if (entity == null) return;
 
-        //TODO CHECKS TO MAKE SURE DAMAGE IS EITHER ACTUAALLY A SWING OR HITTING WITH A BOW. MAYBE ADD MORE EDGE CASES HERE FOR TNT AND POTIONS
+        //TODO CHECKS TO MAKE SURE DAMAGE IS EITHER ACTUALLY A SWING OR HITTING WITH A BOW. MAYBE ADD MORE EDGE CASES HERE FOR TNT AND POTIONS
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK && event.getCause() != EntityDamageEvent.DamageCause.PROJECTILE) {
             return;
         }
@@ -423,7 +462,7 @@ public class SpellManager extends Manager {
             if (!spell.isCasting()) continue;
 
             if (spell.hasOption(SpellOption.CANCEL_BY_DEALING_DAMAGE)) {
-                System.out.println("Cancelled " + spell.getId() + " for " + spell.getOwner().getName() + " reason: deal damage");
+                Bolster.debug("Cancelled " + spell.getId() + " for " + spell.getOwner().getName() + " reason: deal damage");
 
                 spell.cancel();
             }
@@ -446,7 +485,7 @@ public class SpellManager extends Manager {
             if (!spell.isCasting()) continue;
 
             if (spell.hasOption(SpellOption.CANCEL_BY_MOVEMENT)) {
-                System.out.println("Cancelled " + spell.getId() + " for " + spell.getOwner().getName() + " reason: move, dist: " + distance);
+                Bolster.debug("Cancelled " + spell.getId() + " for " + spell.getOwner().getName() + " reason: move, dist: " + distance);
 
                 spell.cancel();
             }
@@ -478,7 +517,7 @@ public class SpellManager extends Manager {
 //            if (!spell2.isCasting()) continue;
 //
 //            if (spell2.isCancelledByCast()) {
-//                System.out.println("Cancelled " + spell.getId() + " for " + spell.getOwner().getName() + " reason: cast");
+//                Bolster.debug("Cancelled " + spell.getId() + " for " + spell.getOwner().getName() + " reason: cast");
 //
 //                spell2.cancel();
 //            }
