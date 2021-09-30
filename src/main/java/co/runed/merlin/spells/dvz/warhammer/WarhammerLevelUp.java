@@ -23,13 +23,10 @@ public class WarhammerLevelUp extends Spell {
 
     @ConfigEntry("required-kills")
     private int levelUpRequiredKills = 1;
-
     @ConfigEntry("max-level")
     private int levelUpMaxLevel = 11;
-
     @ConfigEntry("kill-armor-increase")
     private int killArmorIncrease = 1;
-
     @ConfigEntry("kill-armor-increase-enabled")
     private boolean killArmorIncreaseEnabled = false;
 

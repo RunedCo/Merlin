@@ -36,6 +36,10 @@ public abstract class Target<T> implements Iterable<T> {
         return this;
     }
 
+    public Target<T> ignoreIf(T ignoreTarget) {
+        return this.ignoreIf(t -> t.equals(ignoreTarget));
+    }
+
     public Target<T> ignoreIf(Supplier<Collection<T>> ignoreTargets) {
         this.ignoreTargets = ignoreTargets;
 

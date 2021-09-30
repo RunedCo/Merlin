@@ -6,7 +6,8 @@ import co.runed.bolster.util.config.ConfigEntry;
 import co.runed.merlin.triggers.SpellTrigger;
 import co.runed.merlin.triggers.damage.DamageTrigger;
 import co.runed.merlin.util.AOE;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class AOEDamage extends Spell {
@@ -25,17 +26,24 @@ public class AOEDamage extends Spell {
         super(definition);
     }
 
+    @Override
+    public String getDeathMessage(LivingEntity killer, Player victim, DamageInfo damageInfo) {
+        return victim.getName() + " was killed by AOE damage lol xd by " + killer.getName();
+    }
+
     @SpellTrigger
     public CastResult onDamageEntity(DamageTrigger trigger) {
-        if (trigger.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return CastResult.skip();
+        if (trigger.getType() != DamageType.PRIMARY) return CastResult.skip();
 
         var attacker = getOwner();
 
         var aoe = AOE.livingEntities(attacker.getLocation(), radius)
+                .ignoreIf(attacker)
                 .run(e -> {
                     var damage = new DamageInfo(trigger.getDamage())
                             .withType(DamageType.SECONDARY)
                             .withAttacker(attacker)
+                            .withSource(this)
                             .apply(e);
                 });
 

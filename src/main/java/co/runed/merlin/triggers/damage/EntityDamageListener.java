@@ -1,13 +1,12 @@
 package co.runed.merlin.triggers.damage;
 
+import co.runed.bolster.events.entity.EntityDamageInfoEvent;
 import co.runed.bolster.util.BukkitUtil;
 import co.runed.merlin.core.SpellManager;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 
 /**
@@ -15,11 +14,11 @@ import org.bukkit.event.entity.EntityDeathEvent;
  */
 public class EntityDamageListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
-    private void onDamageEntity(EntityDamageByEntityEvent event) {
+    private void onDamageEntity(EntityDamageInfoEvent event) {
         var entity = BukkitUtil.getDamagerFromEvent(event);
 
         if (entity == null) return;
-        
+
         var inv = entity.getEquipment();
         var stack = inv.getItemInMainHand();
 
@@ -27,7 +26,7 @@ public class EntityDamageListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    private void onEntityTakeDamage(EntityDamageEvent event) {
+    private void onEntityTakeDamage(EntityDamageInfoEvent event) {
         if (!(event.getEntity() instanceof LivingEntity entity)) return;
 
         var inv = entity.getEquipment();

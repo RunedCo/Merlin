@@ -34,6 +34,11 @@ public class WarhammerChannel extends Spell {
 
     @SpellTrigger
     public CastResult onTick(TickTrigger trigger) {
+        var caster = trigger.getContext().getCaster();
+        var bolsterEntity = caster.toBolster();
+
+        bolsterEntity.addHealth(2);
+
         return CastResult.success();
     }
 

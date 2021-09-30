@@ -18,6 +18,7 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -92,7 +93,7 @@ public class ItemImpl extends SpellProvider implements DamageSource {
     }
 
     @Override
-    public String getDeathMessage(Player killer, Player victim, DamageInfo damageInfo) {
+    public String getDeathMessage(LivingEntity killer, Player victim, DamageInfo damageInfo) {
         return super.getDeathMessage(killer, victim, damageInfo) + " using " + getName();
     }
 

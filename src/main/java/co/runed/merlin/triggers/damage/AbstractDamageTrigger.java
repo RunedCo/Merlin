@@ -1,5 +1,8 @@
 package co.runed.merlin.triggers.damage;
 
+import co.runed.bolster.damage.DamageInfo;
+import co.runed.bolster.damage.DamageType;
+import co.runed.bolster.events.entity.EntityDamageInfoEvent;
 import co.runed.bolster.util.BukkitUtil;
 import co.runed.merlin.triggers.AbstractItemEventTrigger;
 import org.bukkit.entity.LivingEntity;
@@ -7,13 +10,17 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class AbstractDamageTrigger extends AbstractItemEventTrigger<EntityDamageEvent> {
-    public AbstractDamageTrigger(EntityDamageEvent baseEvent, ItemStack itemStack) {
+public abstract class AbstractDamageTrigger extends AbstractItemEventTrigger<EntityDamageInfoEvent> {
+    public AbstractDamageTrigger(EntityDamageInfoEvent baseEvent, ItemStack itemStack) {
         super(baseEvent, itemStack);
     }
 
-    public EntityDamageEvent.DamageCause getCause() {
-        return getBaseEvent().getCause();
+    public DamageInfo getInfo() {
+        return getBaseEvent().getDamageInfo();
+    }
+
+    public DamageType getType() {
+        return getInfo().getDamageType();
     }
 
     public double getFinalDamage() {
@@ -25,11 +32,11 @@ public abstract class AbstractDamageTrigger extends AbstractItemEventTrigger<Ent
     }
 
     public double getDamage(EntityDamageEvent.DamageModifier type) {
-        return getBaseEvent().getDamage(type);
+        return getWrappedEvent().getDamage(type);
     }
 
     public double getOriginalDamage(EntityDamageEvent.DamageModifier type) {
-        return getBaseEvent().getOriginalDamage(type);
+        return getWrappedEvent().getOriginalDamage(type);
     }
 
     public void setDamage(double damage) {
@@ -37,7 +44,11 @@ public abstract class AbstractDamageTrigger extends AbstractItemEventTrigger<Ent
     }
 
     public void setDamage(EntityDamageEvent.DamageModifier type, double damage) {
-        getBaseEvent().setDamage(type, damage);
+        getWrappedEvent().setDamage(type, damage);
+    }
+
+    public EntityDamageEvent getWrappedEvent() {
+        return getBaseEvent().getWrappedEvent();
     }
 
     public @Nullable LivingEntity getDamager() {

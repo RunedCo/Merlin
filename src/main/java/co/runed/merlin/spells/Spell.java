@@ -242,7 +242,7 @@ public abstract class Spell implements Identifiable, Nameable, Describable, Conf
 
     /* Damage Source Stuff */
     @Override
-    public String getDeathMessage(Player killer, Player victim, DamageInfo damageInfo) {
+    public String getDeathMessage(LivingEntity killer, Player victim, DamageInfo damageInfo) {
         return null;
     }
 
