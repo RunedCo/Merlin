@@ -227,6 +227,15 @@ public abstract class SpellProviderDefinition<T extends SpellProvider> extends D
         return name + " " + operator + " to " + ChatColor.AQUA + newLevelConfig.getDouble(key);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof SpellProvider provider) {
+            return provider.getDefinition().equals(this);
+        }
+
+        return super.equals(obj);
+    }
+
     private static class SpellData {
         private final SpellDefinition definition;
         private final SpellType spellType;

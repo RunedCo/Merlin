@@ -20,6 +20,7 @@ import co.runed.merlin.costs.Cost;
 import co.runed.merlin.spells.type.SpellType;
 import co.runed.merlin.spells.type.ToggleSpellType;
 import co.runed.merlin.triggers.Trigger;
+import net.kyori.adventure.text.Component;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -242,7 +243,7 @@ public abstract class Spell implements Identifiable, Nameable, Describable, Conf
 
     /* Damage Source Stuff */
     @Override
-    public String getDeathMessage(LivingEntity killer, Player victim, DamageInfo damageInfo) {
+    public Component getDeathMessage(LivingEntity killer, Player victim, DamageInfo damageInfo) {
         return null;
     }
 

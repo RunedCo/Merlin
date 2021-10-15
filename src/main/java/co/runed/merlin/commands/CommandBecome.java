@@ -3,6 +3,7 @@ package co.runed.merlin.commands;
 import co.runed.bolster.commands.CommandBase;
 import co.runed.bolster.util.registries.Registry;
 import co.runed.merlin.classes.ClassManager;
+import co.runed.merlin.core.MerlinPermissions;
 import co.runed.merlin.core.MerlinRegistries;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.StringArgument;
@@ -21,7 +22,7 @@ public class CommandBecome extends CommandBase {
     @Override
     public CommandAPICommand build() {
         return new CommandAPICommand(this.command)
-                .withPermission("bolster.commands.become")
+                .withPermission(MerlinPermissions.COMMAND_BECOME)
                 .withArguments(new StringArgument("class").overrideSuggestions(this::getSuggestions))
                 .executesEntity((sender, args) -> {
                     var id = (String) args[0];

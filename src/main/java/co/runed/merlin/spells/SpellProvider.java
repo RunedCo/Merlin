@@ -1,7 +1,6 @@
 package co.runed.merlin.spells;
 
 import co.runed.bolster.Bolster;
-import co.runed.bolster.damage.DamageInfo;
 import co.runed.bolster.damage.DamageSource;
 import co.runed.bolster.entity.BolsterEntity;
 import co.runed.bolster.game.traits.TraitProvider;
@@ -276,11 +275,6 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
         return BolsterEntity.from(getOwner());
     }
 
-    @Override
-    public String getDeathMessage(LivingEntity killer, Player victim, DamageInfo damageInfo) {
-        return null;
-    }
-
     /* Properties */
     public Properties getProperties() {
         return properties;
@@ -308,5 +302,14 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
 
     public void destroy() {
         setOwner(null);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof SpellProvider provider) {
+            return provider.getDefinition().equals(getDefinition());
+        }
+
+        return super.equals(obj);
     }
 }

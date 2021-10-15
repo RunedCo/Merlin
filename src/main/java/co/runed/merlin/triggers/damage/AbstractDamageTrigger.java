@@ -52,8 +52,14 @@ public abstract class AbstractDamageTrigger extends AbstractItemEventTrigger<Ent
         return getBaseEvent().getWrappedEvent();
     }
 
-    public Entity getTarget() {
+    public Entity getTargetEntity() {
         return getBaseEvent().getEntity();
+    }
+
+    public @Nullable LivingEntity getTarget() {
+        if (getTargetEntity() instanceof LivingEntity livingEntity) return livingEntity;
+
+        return null;
     }
 
     public @Nullable LivingEntity getDamager() {

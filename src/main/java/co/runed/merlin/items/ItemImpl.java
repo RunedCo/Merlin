@@ -93,8 +93,8 @@ public class ItemImpl extends SpellProvider implements DamageSource {
     }
 
     @Override
-    public String getDeathMessage(LivingEntity killer, Player victim, DamageInfo damageInfo) {
-        return super.getDeathMessage(killer, victim, damageInfo) + " using " + getName();
+    public Component getDeathMessage(LivingEntity killer, Player victim, DamageInfo damageInfo) {
+        return super.getDeathMessage(killer, victim, damageInfo).append(Component.text(" using " + getName()));
     }
 
     public void setItemRequirements(Map<SpellDefinition, ItemRequirement> requirements) {

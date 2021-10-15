@@ -172,15 +172,6 @@ public class ItemDefinition extends SpellProviderDefinition<ItemImpl> {
         return value;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof ItemImpl item) {
-            return item.getDefinition().equals(this);
-        }
-
-        return super.equals(obj);
-    }
-
     public static @Nullable ItemDefinition from(ItemStack stack) {
         var id = ItemManager.getInstance().getIdFromStack(stack);
 

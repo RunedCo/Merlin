@@ -77,6 +77,10 @@ public class ClassManager extends Manager {
         setClass(entity, (ClassImpl) null);
     }
 
+    public boolean hasClass(LivingEntity entity, ClassDefinition definition) {
+        return definition.equals(getClass(entity));
+    }
+
     @EventHandler
     private void onConnect(PlayerJoinEvent event) {
         var classInstance = this.getClass(event.getPlayer());

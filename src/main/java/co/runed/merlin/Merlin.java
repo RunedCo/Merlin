@@ -7,8 +7,10 @@ import co.runed.merlin.classes.ClassManager;
 import co.runed.merlin.commands.*;
 import co.runed.merlin.core.ManaManager;
 import co.runed.merlin.core.MerlinTraits;
+import co.runed.merlin.core.SpellListener;
 import co.runed.merlin.core.SpellManager;
 import co.runed.merlin.items.ItemManager;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Merlin extends JavaPlugin {
@@ -43,6 +45,8 @@ public final class Merlin extends JavaPlugin {
         commandManager.add(new CommandBecomeGUI());
         commandManager.add(new CommandMana());
 //        commandManager.add(new CommandSummonDummy());
+
+        Bukkit.getPluginManager().registerEvents(new SpellListener(), this);
 
         this.registerTraits();
     }

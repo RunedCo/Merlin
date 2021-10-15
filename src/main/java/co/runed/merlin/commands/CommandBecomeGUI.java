@@ -2,6 +2,7 @@ package co.runed.merlin.commands;
 
 import co.runed.bolster.commands.CommandBase;
 import co.runed.merlin.classes.ClassImpl;
+import co.runed.merlin.core.MerlinPermissions;
 import co.runed.merlin.core.MerlinRegistries;
 import dev.jorel.commandapi.CommandAPICommand;
 import org.bukkit.Material;
@@ -23,7 +24,7 @@ public class CommandBecomeGUI extends CommandBase {
     @Override
     public CommandAPICommand build() {
         return new CommandAPICommand(this.command)
-                .withPermission("bolster.commands.become")
+                .withPermission(MerlinPermissions.COMMAND_BECOME)
                 .executesPlayer(((sender, args) -> {
                     this.openMenu(sender);
                 }));
