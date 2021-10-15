@@ -29,6 +29,7 @@ public abstract class SpellProviderDefinition<T extends SpellProvider> extends D
     private final Map<Integer, ConfigurationSection> unmergedLevelConfigs = new HashMap<>();
     private final Map<Integer, MilestoneData> milestones = new HashMap<>();
     private final Properties traits = new Properties();
+    private final Map<String, String> langReplacements = new HashMap<>();
 
     private final Set<SpellData> spells = new HashSet<>();
 
@@ -128,6 +129,12 @@ public abstract class SpellProviderDefinition<T extends SpellProvider> extends D
         return this;
     }
 
+    public SpellProviderDefinition<T> addLangReplacement(String key, String value) {
+        this.langReplacements.put(key, value);
+
+        return this;
+    }
+
     @Override
     public void loadConfig(ConfigurationSection config) {
 
@@ -149,6 +156,7 @@ public abstract class SpellProviderDefinition<T extends SpellProvider> extends D
         if (parent instanceof SpellProviderDefinition<T> spellDef) {
             this.spells.addAll(spellDef.spells);
             this.traits.addAll(spellDef.traits);
+            this.langReplacements.putAll(spellDef.langReplacements);
         }
 
         return this;
@@ -159,6 +167,10 @@ public abstract class SpellProviderDefinition<T extends SpellProvider> extends D
         var out = super.create();
 
         out.getTraits().addAll(traits);
+
+        for (var replacement : langReplacements.entrySet()) {
+            out.setLangReplacement(replacement.getKey(), replacement.getValue());
+        }
 
         for (var data : spells) {
             var spell = data.definition.create();

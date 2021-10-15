@@ -5,6 +5,7 @@ import co.runed.bolster.damage.DamageType;
 import co.runed.bolster.events.entity.EntityDamageInfoEvent;
 import co.runed.bolster.util.BukkitUtil;
 import co.runed.merlin.triggers.AbstractItemEventTrigger;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
@@ -49,6 +50,10 @@ public abstract class AbstractDamageTrigger extends AbstractItemEventTrigger<Ent
 
     public EntityDamageEvent getWrappedEvent() {
         return getBaseEvent().getWrappedEvent();
+    }
+
+    public Entity getTarget() {
+        return getBaseEvent().getEntity();
     }
 
     public @Nullable LivingEntity getDamager() {

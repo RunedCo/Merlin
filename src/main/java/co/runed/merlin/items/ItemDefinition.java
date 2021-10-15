@@ -61,6 +61,11 @@ public class ItemDefinition extends SpellProviderDefinition<ItemImpl> {
     }
 
     @Override
+    public ItemDefinition addLangReplacement(String key, String value) {
+        return (ItemDefinition) super.addLangReplacement(key, value);
+    }
+
+    @Override
     public ItemDefinition setName(String name) {
         return (ItemDefinition) super.setName(name);
     }

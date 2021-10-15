@@ -55,6 +55,11 @@ public class ClassDefinition extends SpellProviderDefinition<ClassImpl> {
     }
 
     @Override
+    public ClassDefinition addLangReplacement(String key, String value) {
+        return (ClassDefinition) super.addLangReplacement(key, value);
+    }
+
+    @Override
     public ClassDefinition setIcon(ItemStack icon) {
         return (ClassDefinition) super.setIcon(icon);
     }
