@@ -73,7 +73,9 @@ public class ClassDefinition extends SpellProviderDefinition<ClassImpl> {
     public ClassDefinition from(Definition<ClassImpl> parent) {
         var from = (ClassDefinition) super.from(parent);
 
-        setDisguise(from.disguiseFunction);
+        if (parent instanceof ClassDefinition parentDef) {
+            setDisguise(parentDef.disguiseFunction);
+        }
 
         return from;
     }
