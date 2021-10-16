@@ -178,7 +178,7 @@ public class ItemImpl extends SpellProvider implements DamageSource {
         var knockBack = getTrait(MerlinTraits.KNOCKBACK);
 
         builder = builder.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, new AttributeModifier(attackDamageUuid, "attack_damage", attackDamage > 0 ? attackDamage - 1 : attackDamage, AttributeModifier.Operation.ADD_NUMBER))
-                .addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(attackSpeedUuid, "attack_speed", attackSpeed, AttributeModifier.Operation.ADD_NUMBER))
+                .addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(attackSpeedUuid, "attack_speed", attackSpeed > 0 ? attackSpeed : 1000, AttributeModifier.Operation.ADD_NUMBER))
                 .addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, new AttributeModifier(knockbackResistanceUuid, "knockback_resistance", knockBackResistance, AttributeModifier.Operation.ADD_NUMBER))
                 .addAttributeModifier(Attribute.GENERIC_ATTACK_KNOCKBACK, new AttributeModifier(knockBackUuid, "knockback", knockBack, AttributeModifier.Operation.ADD_NUMBER));
 
