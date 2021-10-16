@@ -241,7 +241,7 @@ public class SpellManager extends Manager {
         var spellProviders = this.spellProviders.getOrDefault(entity.getUniqueId(), new HashSet<>());
 
         for (var provider : spellProviders) {
-            provider.setOwner(entity);
+            if (provider.getOwner() != entity) provider.setOwner(entity);
 
             spells.addAll(provider.getSpells());
         }
