@@ -206,7 +206,6 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
         return entity;
     }
 
-    @Override
     public void setOwner(LivingEntity entity) {
         if (entity != this.entity && this.entity != null) {
             BolsterEntity.from(this.entity).removeTraitProvider(this);

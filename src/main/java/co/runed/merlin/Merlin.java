@@ -1,7 +1,7 @@
 package co.runed.merlin;
 
-import co.runed.bolster.Bolster;
 import co.runed.bolster.managers.CommandManager;
+import co.runed.bolster.util.lang.Lang;
 import co.runed.bolster.util.registries.Registries;
 import co.runed.merlin.classes.ClassManager;
 import co.runed.merlin.commands.*;
@@ -25,7 +25,7 @@ public final class Merlin extends JavaPlugin {
     public void onEnable() {
         _instance = this;
 
-        Bolster.getInstance().loadLang(this);
+        Lang.load(this);
 
         // Create Managers
         this.itemManager = new ItemManager(this);

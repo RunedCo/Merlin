@@ -39,7 +39,7 @@ public class GuiMilestones extends Gui {
 
     @Override
     public String getTitle(Player player) {
-        return "Milestones for " + item.getName();
+        return item.getName();
     }
 
     @Override

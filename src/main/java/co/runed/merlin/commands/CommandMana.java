@@ -17,7 +17,6 @@ public class CommandMana extends CommandBase {
     List<String> operations = new ArrayList<>();
     List<String> types = new ArrayList<>();
 
-
     public CommandMana() {
         super("mana");
     }

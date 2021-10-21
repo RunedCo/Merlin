@@ -180,7 +180,6 @@ public abstract class Spell implements Identifiable, Nameable, Describable, Conf
         return owner;
     }
 
-    @Override
     public void setOwner(LivingEntity entity) {
         this.owner = entity;
     }

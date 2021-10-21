@@ -4,7 +4,9 @@ import co.runed.bolster.commands.CommandBase;
 import co.runed.bolster.managers.PlayerManager;
 import co.runed.bolster.util.Category;
 import co.runed.bolster.util.registries.Registry;
+import co.runed.merlin.core.MerlinPermissions;
 import co.runed.merlin.core.MerlinRegistries;
+import co.runed.merlin.gui.GuiMilestones;
 import co.runed.merlin.items.ItemDefinition;
 import co.runed.merlin.items.ItemManager;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -26,7 +28,7 @@ public class CommandItems extends CommandBase {
         return MerlinRegistries.ITEMS.getEntries().values().stream().map(Registry.Entry::getId).toArray(String[]::new);
     }
 
-    private String[] getLevelableSuggections(CommandSender sender) {
+    private String[] getLevelableSuggestions(CommandSender sender) {
         var items = new ArrayList<>();
 
         for (var item : MerlinRegistries.ITEMS.getEntries().values()) {
@@ -41,7 +43,7 @@ public class CommandItems extends CommandBase {
     @Override
     public CommandAPICommand build() {
         return new CommandAPICommand(this.command)
-                .withPermission("bolster.commands.items")
+                .withPermission(MerlinPermissions.COMMAND_ITEMS)
                 .withSubcommand(new CommandAPICommand("give")
                         .withArguments(
                                 new PlayerArgument("player"),
@@ -78,6 +80,7 @@ public class CommandItems extends CommandBase {
                             sender.sendMessage("Removed " + Math.min(amountInInv, amount) + " " + itemDef.getName() + " from " + player.getDisplayName());
                         })
                 )
+
                 .withSubcommand(new CommandAPICommand("clear")
                         .withArguments(
                                 new PlayerArgument("player"),
@@ -93,10 +96,28 @@ public class CommandItems extends CommandBase {
                             sender.sendMessage("Cleared all " + itemDef.getName() + " from " + player.getDisplayName());
                         })
                 )
+                .withSubcommand(new CommandAPICommand("milestones")
+                        .withArguments(
+                                new PlayerArgument("player"),
+                                new StringArgument("item_id").overrideSuggestions(this::getSuggestions)
+                        )
+                        .executes((sender, args) -> {
+                            var player = (Player) args[0];
+                            var id = (String) args[1];
+                            var itemDef = MerlinRegistries.ITEMS.get(id);
+
+                            if (!(itemDef instanceof ItemDefinition realItemDef)) {
+                                sender.sendMessage("Invalid item '" + id + "'");
+                                return;
+                            }
+
+                            new GuiMilestones(null, realItemDef).show(player);
+                        })
+                )
                 .withSubcommand(new CommandAPICommand("setlevel")
                         .withArguments(
                                 new PlayerArgument("player"),
-                                new StringArgument("item_id").overrideSuggestions(this::getLevelableSuggections),
+                                new StringArgument("item_id").overrideSuggestions(this::getLevelableSuggestions),
                                 new IntegerArgument("amount", 0)
                         )
                         .executes((sender, args) -> {
