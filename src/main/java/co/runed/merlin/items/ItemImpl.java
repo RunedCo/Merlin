@@ -120,7 +120,6 @@ public class ItemImpl extends SpellProvider implements DamageSource {
     public List<Component> getStatsLore() {
         List<Component> out = new ArrayList<>();
 
-        // TODO atk spd
         var attackDamage = getTrait(MerlinTraits.ATTACK_DAMAGE);
         var attackSpeed = getTrait(MerlinTraits.ATTACK_SPEED);
         var knockBackResistance = getTrait(MerlinTraits.KNOCKBACK_RESISTANCE);
@@ -133,6 +132,10 @@ public class ItemImpl extends SpellProvider implements DamageSource {
 
         if (attackDamage > 1) {
             out.add(Component.text(ChatColor.GRAY + "Attack Damage: " + ChatColor.AQUA + attackDamage));
+        }
+
+        if (attackSpeed > 1) {
+            out.add(Component.text(ChatColor.GRAY + "Attack Speed: " + ChatColor.AQUA + attackSpeed));
         }
 
         if (knockBack > 0) {

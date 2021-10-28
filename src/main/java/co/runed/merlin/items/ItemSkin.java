@@ -3,6 +3,7 @@ package co.runed.merlin.items;
 import co.runed.bolster.util.ItemBuilder;
 import co.runed.bolster.util.config.Configurable;
 import co.runed.dayroom.util.Identifiable;
+import co.runed.merlin.core.MerlinRegistries;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
@@ -22,9 +23,7 @@ public class ItemSkin implements Identifiable, Configurable {
 
     @Override
     public String getId() {
-        // TODO
-        return "";
-//        return MerlinRegistries.ITEM_SKINS.getId(this);
+        return MerlinRegistries.ITEM_SKINS.getId(this);
     }
 
     @Override

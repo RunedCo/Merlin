@@ -233,8 +233,6 @@ public class SpellManager extends Manager {
     }
 
     public Collection<Spell> getSpells(LivingEntity entity) {
-        // TODO(Jono): SORT BY SPELL PRIORITY
-
         if (entity == null) return new HashSet<>();
 
         var spells = new ArrayList<Spell>();
@@ -301,7 +299,6 @@ public class SpellManager extends Manager {
 
             spell.setCasting(true);
 
-            // TODO change system for cast time
             if (spell.getCastTime() > 0 && result.isSuccess()) {
                 var castTimeTicks = (long) (spell.getCastTime() * 20L);
                 var repeats = new AtomicLong();

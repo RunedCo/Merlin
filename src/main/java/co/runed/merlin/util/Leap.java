@@ -1,5 +1,6 @@
 package co.runed.merlin.util;
 
+import co.runed.bolster.v1_16_R3.CraftUtil;
 import co.runed.merlin.Merlin;
 import co.runed.merlin.util.task.RepeatingTask;
 import co.runed.merlin.util.task.Task;
@@ -24,6 +25,7 @@ public class Leap implements Listener {
     private boolean delayedIgnoreTriggered = false;
     private LivingEntity entity = null;
     private Runnable onLand = null;
+    private boolean playAnimation = false;
 
     private Task checkTask;
 
@@ -52,6 +54,12 @@ public class Leap implements Listener {
         return this;
     }
 
+    public Leap playAnimation(boolean playAnimation) {
+        this.playAnimation = playAnimation;
+
+        return this;
+    }
+
     public Leap apply(LivingEntity entity) {
         var velocity = entity.getLocation().getDirection().clone();
 
@@ -72,11 +80,16 @@ public class Leap implements Listener {
         started = true;
         this.entity = entity;
 
+        if (entity instanceof Player player && playAnimation) {
+            CraftUtil.playRiptideAnimation(player, 10);
+        }
+
         return this;
     }
 
     private void stop() {
         if (checkTask != null) checkTask.cancel();
+
         entity = null;
         started = false;
 
