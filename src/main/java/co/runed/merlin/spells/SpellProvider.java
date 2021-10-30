@@ -13,6 +13,7 @@ import co.runed.bolster.util.config.ConfigUtil;
 import co.runed.bolster.util.config.Configurable;
 import co.runed.bolster.util.lang.Lang;
 import co.runed.bolster.util.lang.LangProvider;
+import co.runed.bolster.util.registries.Registries;
 import co.runed.dayroom.properties.Properties;
 import co.runed.dayroom.properties.Property;
 import co.runed.dayroom.util.Describable;
@@ -32,11 +33,11 @@ import java.util.*;
 public abstract class SpellProvider extends TraitProvider implements Identifiable, Nameable, Describable, Configurable, Owned, Enableable, DamageSource, IconPreview, LangProvider {
     public static final String CONFIG_KEY_HEALTH = "health";
 
-    @ConfigEntry("enabled")
+    @ConfigEntry(key = "enabled")
     private boolean enabled = false;
-    @ConfigEntry("name")
+    @ConfigEntry(key = "name")
     private String name;
-    @ConfigEntry("description")
+    @ConfigEntry(key = "description")
     private String description;
 
     private final SpellProviderDefinition<?> definition;
@@ -142,8 +143,6 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
         ConfigUtil.loadAnnotatedConfig(config, this);
         ConfigUtil.parseVariables(config);
 
-        setTrait(Traits.MAX_HEALTH, config.getDouble(CONFIG_KEY_HEALTH, getTrait(Traits.MAX_HEALTH)));
-
         var langConfig = ConfigUtil.create();
 
         if (config.isConfigurationSection("lang")) {
@@ -152,14 +151,24 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
             langSource = ConfigUtil.toStringMap(langConfig, true);
         }
 
-        for (var spell : spells) {
-            if (config.isConfigurationSection(spell.getId())) {
-                var spellConfig = config.getConfigurationSection(spell.getId());
+        if (config.isConfigurationSection("traits")) {
+            var traitSection = config.getConfigurationSection("traits");
 
-                spellConfig.set("lang", langConfig);
+            ConfigUtil.loadProperties(Registries.TRAITS, traitSection, getTraits());
+        }
 
-                spell.setConfig(spellConfig);
-                spell.loadConfig(spellConfig);
+        if (config.isConfigurationSection("spells")) {
+            var spellsConfig = config.getConfigurationSection("spells");
+
+            for (var spell : spells) {
+                if (spellsConfig.isConfigurationSection(spell.getId())) {
+                    var spellConfig = spellsConfig.getConfigurationSection(spell.getId());
+
+                    spellConfig.set("lang", langConfig);
+
+                    spell.setConfig(spellConfig);
+                    spell.loadConfig(spellConfig);
+                }
             }
         }
     }
@@ -249,7 +258,9 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
         for (int milestoneLevel : milestones.keySet()) {
             if (this.level > milestoneLevel) {
                 var milestone = milestones.get(milestoneLevel);
-                var config = ConfigUtil.parseVariables(ConfigUtil.cloneSection(milestone.getOriginalConfig()), levels.get(level));
+                var originalClone = ConfigUtil.cloneSection(milestone.getOriginalConfig());
+                var levelConfig = levels.get(level);
+                var config = ConfigUtil.parseVariables(originalClone, levelConfig);
 
                 milestone.setConfig(config);
             }

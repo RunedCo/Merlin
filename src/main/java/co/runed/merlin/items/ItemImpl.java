@@ -40,7 +40,7 @@ public class ItemImpl extends SpellProvider implements DamageSource {
 
     private final Map<SpellDefinition, ItemRequirement> itemRequirements = new HashMap<>();
 
-    @ConfigEntry("droppable")
+    @ConfigEntry(key = "droppable")
     private boolean droppable = false;
 
     public ItemImpl(ItemDefinition definition) {
@@ -50,12 +50,12 @@ public class ItemImpl extends SpellProvider implements DamageSource {
     @Override
     public void loadConfig(ConfigurationSection config) {
         super.loadConfig(config);
-
-        /* Attributes */
-        setTrait(MerlinTraits.ATTACK_DAMAGE, config.getDouble(ATTACK_DAMAGE_KEY, 1));
-        setTrait(MerlinTraits.ATTACK_SPEED, config.getDouble(ATTACK_SPEED_KEY, 0));
-        setTrait(MerlinTraits.KNOCKBACK_RESISTANCE, config.getDouble(KNOCKBACK_RESISTANCE_KEY, 0));
-        setTrait(MerlinTraits.KNOCKBACK, config.getDouble(KNOCKBACK_KEY, 0));
+//
+//        /* Attributes */
+//        setTrait(MerlinTraits.ATTACK_DAMAGE, config.getDouble(ATTACK_DAMAGE_KEY, 1));
+//        setTrait(MerlinTraits.ATTACK_SPEED, config.getDouble(ATTACK_SPEED_KEY, 0));
+//        setTrait(MerlinTraits.KNOCKBACK_RESISTANCE, config.getDouble(KNOCKBACK_RESISTANCE_KEY, 0));
+//        setTrait(MerlinTraits.KNOCKBACK, config.getDouble(KNOCKBACK_KEY, 0));
 
         rebuild();
     }

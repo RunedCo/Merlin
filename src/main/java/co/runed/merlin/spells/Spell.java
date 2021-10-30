@@ -34,17 +34,17 @@ import java.util.Map;
 public abstract class Spell implements Identifiable, Nameable, Describable, Configurable, Owned, DamageSource, Enableable, CooldownSource<Spell>, LangProvider {
     private final SpellDefinition definition;
 
-    @ConfigEntry("enabled")
+    @ConfigEntry(key = "enabled")
     private boolean enabled = true;
-    @ConfigEntry("cooldown")
+    @ConfigEntry(key = "cooldown")
     private double cooldown = 0;
-    @ConfigEntry("charges")
+    @ConfigEntry(key = "charges")
     private int charges = 1;
-    @ConfigEntry("priority")
+    @ConfigEntry(key = "priority")
     private int priority = 1;
-    @ConfigEntry("shared-cooldown-id")
+    @ConfigEntry(key = "shared-cooldown-id")
     private String cooldownId = null;
-    @ConfigEntry("cast-time")
+    @ConfigEntry(key = "cast-time")
     private double castTime = 0;
 
     private boolean initialised = false;

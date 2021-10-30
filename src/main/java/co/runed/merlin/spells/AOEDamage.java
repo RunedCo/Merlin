@@ -12,9 +12,9 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class AOEDamage extends Spell {
-    @ConfigEntry("radius")
+    @ConfigEntry(key = "radius")
     private double radius = 1;
-    @ConfigEntry("damage")
+    @ConfigEntry(key = "damage")
     private double damage;
 
     public AOEDamage(@NotNull SpellDefinition definition, double radius) {
