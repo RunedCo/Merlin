@@ -96,7 +96,11 @@ public class SpellManager extends Manager {
     public SpellProvider getOrCreateProvider(LivingEntity entity, SpellProviderDefinition<?> definition) {
         var provider = SpellManager.getInstance().getProvider(entity, definition);
 
-        if (provider != null) return provider;
+        if (provider != null) {
+            if (provider.getOwner() != entity) provider.setOwner(entity);
+            if (!provider.isEnabled()) provider.setEnabled(true);
+            return provider;
+        }
 
         provider = definition.create();
 

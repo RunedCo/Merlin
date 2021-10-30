@@ -1,5 +1,6 @@
 package co.runed.merlin.gui;
 
+import co.runed.bolster.entity.BolsterEntity;
 import co.runed.bolster.gui.Gui;
 import co.runed.bolster.gui.GuiConstants;
 import co.runed.bolster.util.Category;
@@ -54,15 +55,14 @@ public class GuiItems extends Gui {
 
         var items = MerlinRegistries.ITEMS.getEntries();
 
+        var playerData = BolsterEntity.from(player).getPlayerData();
+
         for (var entry : items.values()) {
             var item = entry.create().create();
+            item.setLevel(playerData.getProviderLevel(item.getId()));
 
             for (var category : entry.getCategories()) {
                 itemCategories.putIfAbsent(category, new ArrayList<>());
-
-                item.setOwner(player);
-                item.setOwner(null);
-                item.rebuild();
 
                 itemCategories.get(category).add(item.toItemStack());
             }

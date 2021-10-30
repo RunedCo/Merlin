@@ -217,14 +217,21 @@ public class ItemManager extends Manager {
         stack.setAmount(count);
 
         if (!inventory.containsAtLeast(stack, count)) {
-            var entity = inventory.getViewers().size() > 1 ? inventory.getViewers().get(0) : null;
+            LivingEntity entity = null;
+
+            if (inventory.getHolder() instanceof LivingEntity le) {
+                entity = le;
+            }
+            else if (inventory.getViewers().size() > 1) {
+                entity = inventory.getViewers().get(0);
+            }
+
+            inventory.removeItem(stack);
 
             // TODO this is a bit jank
             if (entity != null && itemDef instanceof ItemDefinition definition && definition.shouldClearOnRemove() && !anyInventoryContainsAtLeast(entity, itemDef, 1)) {
                 clearItem(entity, itemDef);
             }
-
-            inventory.removeItem(stack);
 
             return false;
         }

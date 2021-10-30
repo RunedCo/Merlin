@@ -92,9 +92,9 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
 
     @Override
     public void setEnabled(boolean enabled) {
-        Bolster.debug("Provider " + getId() + " enabled=" + enabled + " owner=" + getOwner());
+        Bolster.debug("Provider " + getId() + " enabled=" + enabled + " prev-enabled=" + this.enabled + " owner=" + getOwner());
 
-        if (isEnabled() != enabled && getOwner() != null) {
+        if (this.enabled != enabled && getOwner() != null) {
             // On Disable
             if (!enabled) {
                 onDisable();
@@ -311,6 +311,7 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
     }
 
     public void destroy() {
+        this.setEnabled(false);
         setOwner(null);
     }
 
