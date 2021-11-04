@@ -33,10 +33,10 @@ public class ItemImpl extends SpellProvider implements DamageSource {
     public static final String KNOCKBACK_KEY = "knockback";
     public static final String DROPPABLE_KEY = "droppable";
 
-    private static final UUID attackDamageUuid = new UUID(1234, 1234);
-    private static final UUID attackSpeedUuid = new UUID(1235, 1235);
-    private static final UUID knockbackResistanceUuid = new UUID(1236, 1236);
-    private static final UUID knockBackUuid = new UUID(1237, 1237);
+    private final UUID attackDamageUuid = UUID.randomUUID();
+    private final UUID attackSpeedUuid = UUID.randomUUID();
+    private final UUID knockbackResistanceUuid = UUID.randomUUID();
+    private final UUID knockBackUuid = UUID.randomUUID();
 
     private final Map<SpellDefinition, ItemRequirement> itemRequirements = new HashMap<>();
 
@@ -180,10 +180,10 @@ public class ItemImpl extends SpellProvider implements DamageSource {
         var knockBackResistance = getTrait(MerlinTraits.KNOCKBACK_RESISTANCE);
         var knockBack = getTrait(MerlinTraits.KNOCKBACK);
 
-        builder = builder.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, new AttributeModifier(attackDamageUuid, "attack_damage", attackDamage > 0 ? attackDamage - 1 : attackDamage, AttributeModifier.Operation.ADD_NUMBER))
-                .addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(attackSpeedUuid, "attack_speed", attackSpeed > 0 ? attackSpeed : 1000, AttributeModifier.Operation.ADD_NUMBER))
-                .addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, new AttributeModifier(knockbackResistanceUuid, "knockback_resistance", knockBackResistance, AttributeModifier.Operation.ADD_NUMBER))
-                .addAttributeModifier(Attribute.GENERIC_ATTACK_KNOCKBACK, new AttributeModifier(knockBackUuid, "knockback", knockBack, AttributeModifier.Operation.ADD_NUMBER));
+        builder = builder.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, new AttributeModifier(attackDamageUuid, getId() + "_" + "attack_damage", attackDamage > 0 ? attackDamage - 1 : attackDamage, AttributeModifier.Operation.ADD_NUMBER))
+                .addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(attackSpeedUuid, getId() + "_" + "attack_speed", attackSpeed > 0 ? attackSpeed : 1000, AttributeModifier.Operation.ADD_NUMBER))
+                .addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, new AttributeModifier(knockbackResistanceUuid, getId() + "_" + "knockback_resistance", knockBackResistance, AttributeModifier.Operation.ADD_NUMBER))
+                .addAttributeModifier(Attribute.GENERIC_ATTACK_KNOCKBACK, new AttributeModifier(knockBackUuid, getId() + "_" + "knockback", knockBack, AttributeModifier.Operation.ADD_NUMBER));
 
 //        if (this.hasSkin()) {
 //            ItemSkin skin = this.getSkin();

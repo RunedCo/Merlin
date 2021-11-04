@@ -16,12 +16,12 @@ public abstract class AbstractDamageTrigger extends AbstractItemEventTrigger<Ent
         super(baseEvent, itemStack);
     }
 
-    public DamageInfo getInfo() {
+    public DamageInfo getDamageInfo() {
         return getBaseEvent().getDamageInfo();
     }
 
     public DamageType getType() {
-        return getInfo().getDamageType();
+        return getDamageInfo().getDamageType();
     }
 
     public double getFinalDamage() {
