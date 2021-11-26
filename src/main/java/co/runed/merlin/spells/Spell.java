@@ -5,6 +5,7 @@ import co.runed.bolster.damage.DamageSource;
 import co.runed.bolster.managers.CooldownManager;
 import co.runed.bolster.util.Owned;
 import co.runed.bolster.util.TaskUtil;
+import co.runed.bolster.util.TimeUtil;
 import co.runed.bolster.util.config.ConfigEntry;
 import co.runed.bolster.util.config.ConfigUtil;
 import co.runed.bolster.util.config.Configurable;
@@ -15,10 +16,8 @@ import co.runed.dayroom.util.Describable;
 import co.runed.dayroom.util.Enableable;
 import co.runed.dayroom.util.Identifiable;
 import co.runed.dayroom.util.Nameable;
-import co.runed.merlin.Merlin;
 import co.runed.merlin.costs.Cost;
 import co.runed.merlin.spells.type.SpellType;
-import co.runed.merlin.spells.type.ToggleSpellType;
 import co.runed.merlin.triggers.Trigger;
 import net.kyori.adventure.text.Component;
 import org.bukkit.configuration.ConfigurationSection;
@@ -26,6 +25,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,6 +52,7 @@ public abstract class Spell implements Identifiable, Nameable, Describable, Conf
     private boolean toggled = false;
     private boolean casting = false;
     private TaskUtil.TaskSeries castingTask = null;
+    private ZonedDateTime lastCastTimestamp = null;
 
     private LivingEntity owner;
     private SpellProvider parent;
@@ -120,6 +121,8 @@ public abstract class Spell implements Identifiable, Nameable, Describable, Conf
 
         var costResult = evaluateCosts(trigger);
         if (!costResult.isSuccess() && !hasOption(SpellOption.IGNORE_COSTS)) return costResult;
+
+        lastCastTimestamp = TimeUtil.now();
 
         return CastResult.success();
     }
@@ -228,16 +231,8 @@ public abstract class Spell implements Identifiable, Nameable, Describable, Conf
         return spellType;
     }
 
-    public boolean isToggled() {
-        return toggled;
-    }
-
-    public void setToggled(boolean toggled) {
-        if (!(getType() instanceof ToggleSpellType)) {
-            Merlin.getInstance().getLogger().warning("Tried to toggle non-toggleable spell " + getId() + " with parent " + getParent().getId());
-        }
-
-        this.toggled = toggled;
+    public ZonedDateTime getLastCastTimestamp() {
+        return lastCastTimestamp;
     }
 
     /* Damage Source Stuff */
@@ -334,7 +329,7 @@ public abstract class Spell implements Identifiable, Nameable, Describable, Conf
 
     @Override
     public String getCooldownId() {
-        return this.cooldownId == null ? getId() : cooldownId;
+        return this.cooldownId == null ? getParent().getId() + "." + getId() : cooldownId;
     }
 
     @Override
@@ -381,9 +376,5 @@ public abstract class Spell implements Identifiable, Nameable, Describable, Conf
         }
 
         return super.equals(obj);
-    }
-
-    public void destroy() {
-
     }
 }

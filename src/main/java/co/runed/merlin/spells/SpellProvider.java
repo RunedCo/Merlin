@@ -28,6 +28,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
+import java.time.ZonedDateTime;
 import java.util.*;
 
 public abstract class SpellProvider extends TraitProvider implements Identifiable, Nameable, Describable, Configurable, Owned, Enableable, DamageSource, IconPreview, LangProvider {
@@ -182,6 +183,14 @@ public abstract class SpellProvider extends TraitProvider implements Identifiabl
 
     public List<Spell> getSpells() {
         return spells;
+    }
+
+    public ZonedDateTime getLastCastTime(SpellDefinition spell) {
+        for (var spellInstance : getSpells()) {
+            if (spellInstance.getDefinition().equals(spell)) return spellInstance.getLastCastTimestamp();
+        }
+
+        return null;
     }
 
     public CastResult preCast(Trigger trigger) {

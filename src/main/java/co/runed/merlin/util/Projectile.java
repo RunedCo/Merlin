@@ -237,6 +237,10 @@ public class Projectile implements Listener {
         return this;
     }
 
+    public LivingEntity getOwner() {
+        return owner;
+    }
+
     public Entity getEntity() {
         return entity;
     }
