@@ -2,10 +2,10 @@ package co.runed.merlin.spells;
 
 import co.runed.bolster.damage.DamageInfo;
 import co.runed.bolster.damage.DamageType;
+import co.runed.bolster.util.AOE;
 import co.runed.bolster.util.config.ConfigEntry;
 import co.runed.merlin.triggers.SpellTrigger;
 import co.runed.merlin.triggers.damage.DamageTrigger;
-import co.runed.merlin.util.AOE;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
